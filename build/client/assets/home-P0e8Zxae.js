@@ -1,0 +1,1 @@
+import{o as e,t}from"./jsx-runtime-7vNEmt-1.js";import{t as n}from"./compiler-runtime-BykOnUQD.js";var r=n(),i=t(),a=e(()=>{let e=(0,r.c)(1),t;return e[0]===Symbol.for(`react.memo_cache_sentinel`)?(t=(0,i.jsx)(`div`,{children:`Home`}),e[0]=t):t=e[0],t});export{a as default};
