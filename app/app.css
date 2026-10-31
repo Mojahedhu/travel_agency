@@ -283,7 +283,7 @@
       @apply aspect-square size-10 rounded-full;
     }
     article {
-      @apply flex max-w-[115px] flex-col gap-[2px];
+      @apply flex max-w-28.75 flex-col gap-0.5;
       h2 {
         @apply text-dark-200 truncate text-sm font-semibold md:text-base;
       }

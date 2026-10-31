@@ -21,6 +21,7 @@
     "@syncfusion/ej2-react-splitbuttons": "^35.1.37",
     "@tailwindcss/vite": "^4.3.3",
     "clsx": "^2.1.1",
+    "dayjs": "^1.11.23",
     "isbot": "^5",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
