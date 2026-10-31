@@ -11,7 +11,7 @@ export const formatDate = (dateString: string): string => {
 };
 
 export function parseMarkdownToJson(markdownText: string): unknown | null {
-  const regex = /```json\n([\s\S]+?)\n```/;
+  const regex = /```json\r?\n([\s\S]+?)\r?\n```/;
   const match = markdownText.match(regex);
 
   if (match && match[1]) {
@@ -43,7 +43,7 @@ export function getFirstWord(input: string = ""): string {
 
 export const calculateTrendPercentage = (
   countOfThisMonth: number,
-  countOfLastMonth: number
+  countOfLastMonth: number,
 ): TrendResult => {
   if (countOfLastMonth === 0) {
     return countOfThisMonth === 0
