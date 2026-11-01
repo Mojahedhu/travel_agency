@@ -14,6 +14,9 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/sign-in": {
+    params: {};
+  };
   "/dashboard": {
     params: {};
   };
@@ -25,7 +28,11 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/dashboard" | "/all-users";
+    page: "/" | "/sign-in" | "/dashboard" | "/all-users";
+  };
+  "routes/root/sign-in.tsx": {
+    id: "routes/root/sign-in";
+    page: "/sign-in";
   };
   "routes/admin/admin-layout.tsx": {
     id: "routes/admin/admin-layout";
@@ -43,6 +50,7 @@ type RouteFiles = {
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
+  "routes/root/sign-in": typeof import("./app/routes/root/sign-in.tsx");
   "routes/admin/admin-layout": typeof import("./app/routes/admin/admin-layout.tsx");
   "routes/admin/dashboard": typeof import("./app/routes/admin/dashboard.tsx");
   "routes/admin/all-users": typeof import("./app/routes/admin/all-users.tsx");
