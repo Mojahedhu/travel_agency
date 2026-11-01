@@ -440,7 +440,7 @@
 }
 /* v4: important modifier `!` now goes at the END of each class */
 @utility button-class {
-  @apply bg-primary-100! flex! items-center! justify-center! gap-1.5! rounded-lg! px-4! shadow-none!;
+  @apply bg-primary-100! flex! items-center! justify-center! gap-1.5! rounded-lg! bg-linear-0! px-4! shadow-none!;
 }
 /* v4: `shadow-sm` was renamed to `shadow-xs` (same look as v3's shadow-sm) */
 @utility button-class-secondary {
@@ -480,8 +480,8 @@ body {
 
 .glassmorphism {
   background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  /* backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px); */
 }
 
 /* ======== css overrides for syncfusion ========= */

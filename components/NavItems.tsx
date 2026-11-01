@@ -1,7 +1,9 @@
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLoaderData, useNavigate } from "react-router";
 import { sidebarItems } from "../app/constants";
 import { cn } from "../app/lib/utils";
 import clsx from "clsx";
+import { logoutUser } from "../app/appwrite/auth";
+import { useState } from "react";
 
 type Active = {
   isActive: boolean;
@@ -12,15 +14,20 @@ interface NavItemsProps {
 }
 
 const NavItems = ({ handleClick }: NavItemsProps) => {
-  const user = {
-    name: "Mojahed",
-    email: "mojahed@gmail.com",
-    imageUrl: "/assets/images/david.webp",
+  const user = useLoaderData() as User;
+  const navigate = useNavigate();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+
+  const handleLogout = async () => {
+    setLogoutError(null);
+    try {
+      await logoutUser();
+      navigate("/sign-in");
+    } catch {
+      setLogoutError("Logout failed. Please try again.");
+    }
   };
 
-  const handleLogout = () => {
-    console.log("logged out");
-  };
   return (
     <section className="nav-items">
       <Link to={"/"} className="link-logo">
@@ -51,13 +58,16 @@ const NavItems = ({ handleClick }: NavItemsProps) => {
             </NavLink>
           ))}
         </nav>
-
         <footer className="nav-footer">
-          <img src={user.imageUrl} alt={user.name} />
+          <img
+            src={user?.imageUrl || "/assets/icons/logo.svg"}
+            alt={user?.name || "profile image"}
+            referrerPolicy="no-referrer"
+          />
 
           <article>
-            <h2>{user.name}</h2>
-            <p>{user.email}</p>
+            <h2>{user?.name}</h2>
+            <p>{user?.email}</p>
           </article>
           <button
             className="group hover:bg-primary-100 cursor-pointer rounded px-2 py-1.5"
@@ -70,6 +80,14 @@ const NavItems = ({ handleClick }: NavItemsProps) => {
             />
           </button>
         </footer>
+        {logoutError && (
+          <p
+            role="alert"
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-red-200 px-3 py-2 text-red-500"
+          >
+            {logoutError}
+          </p>
+        )}
       </div>
     </section>
   );
