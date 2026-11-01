@@ -83,9 +83,9 @@ const NavItems = ({ handleClick }: NavItemsProps) => {
         {logoutError && (
           <p
             role="alert"
-            className="by-2 absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-red-200 px-3 text-red-500"
+            className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-red-200 px-3 py-2 text-red-500"
           >
-            {logoutError} there error
+            {logoutError}
           </p>
         )}
       </div>
