@@ -3,6 +3,7 @@ import { SidebarComponent } from "@syncfusion/ej2-react-navigations";
 import { MobileSidebar, NavItems } from "../../../components";
 import { account } from "../../appwrite/client";
 import { getExistingUser, storeUserData } from "../../appwrite/auth";
+import { AppwriteException } from "appwrite";
 
 export const clientLoader = async () => {
   try {
@@ -25,8 +26,16 @@ export const clientLoader = async () => {
 
     return userDoc;
   } catch (error) {
-    console.error("Auth check failed:", error);
-    return redirect("/sign-in");
+    if (error instanceof Response) {
+      throw error;
+    }
+    // Only redirect to /sign-in if Appwrite confirms the user is unauthenticated (HTTP 401)
+    if (error instanceof AppwriteException && error.code === 401) {
+      return redirect("/sign-in");
+    }
+    console.error("Transient or unexpected auth error:", error);
+    // Rethrow network/500/transient errors to the ErrorBoundary
+    throw error;
   }
 };
 const AdminLayout = () => {

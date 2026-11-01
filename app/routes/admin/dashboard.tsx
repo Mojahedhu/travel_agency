@@ -1,23 +1,19 @@
+import { useRouteLoaderData } from "react-router";
 import { Header, StatsCard, TripCard } from "../../../components";
-import { getUser } from "../../appwrite/auth";
 import { allTrips, dashboardStats } from "../../constants";
-import type { Route } from "./+types/admin-layout";
 
 const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } =
   dashboardStats;
 
-export const clientLoader = async () => {
-  const user = await getUser();
-  return user;
-};
-
-const Dashboard = ({ loaderData }: Route.ComponentProps) => {
-  const user = loaderData as unknown as User | null;
+const Dashboard = () => {
+  const user = useRouteLoaderData("routes/admin/admin-layout") as
+    | UserData
+    | undefined;
 
   return (
     <main className="dashboard wrapper">
       <Header
-        title={`${user?.name ?? "Guest"} 👋`}
+        title={`${user?.name ?? "Admin"} 👋`}
         description="Track activity, trends and popular destination in real time"
       />
       <section className="flex flex-col gap-6">

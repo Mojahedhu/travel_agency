@@ -3,6 +3,7 @@ import { sidebarItems } from "../app/constants";
 import { cn } from "../app/lib/utils";
 import clsx from "clsx";
 import { logoutUser } from "../app/appwrite/auth";
+import { useState } from "react";
 
 type Active = {
   isActive: boolean;
@@ -14,12 +15,17 @@ interface NavItemsProps {
 
 const NavItems = ({ handleClick }: NavItemsProps) => {
   const user = useLoaderData() as User;
-
   const navigate = useNavigate();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   const handleLogout = async () => {
-    await logoutUser();
-    navigate("/sign-in");
+    setLogoutError(null);
+    try {
+      await logoutUser();
+      navigate("/sign-in");
+    } catch {
+      setLogoutError("Logout failed. Please try again.");
+    }
   };
 
   return (
@@ -52,7 +58,6 @@ const NavItems = ({ handleClick }: NavItemsProps) => {
             </NavLink>
           ))}
         </nav>
-
         <footer className="nav-footer">
           <img
             src={user?.imageUrl || "/assets/icons/logo.svg"}
@@ -75,6 +80,14 @@ const NavItems = ({ handleClick }: NavItemsProps) => {
             />
           </button>
         </footer>
+        {logoutError && (
+          <p
+            role="alert"
+            className="by-2 absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg bg-red-200 px-3 text-red-500"
+          >
+            {logoutError} there error
+          </p>
+        )}
       </div>
     </section>
   );

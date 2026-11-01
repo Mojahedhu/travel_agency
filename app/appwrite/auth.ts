@@ -1,4 +1,4 @@
-import { ID, OAuthProvider, Query } from "appwrite";
+import { OAuthProvider, Query } from "appwrite";
 import { database, appwriteConfig, account } from "./client";
 import { redirect } from "react-router";
 
@@ -48,7 +48,7 @@ const storeUserData = async () => {
     const newUser = await database.createRow({
       databaseId,
       tableId: userCollectionId,
-      rowId: ID.unique(),
+      rowId: user.$id,
       data: {
         accountId: user.$id,
         email: user.email,
