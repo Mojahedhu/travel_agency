@@ -4,12 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "react-router dev",
+    "start": "react-router-serve ./build/server/index.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@react-router/node": "^8.5.1",
+    "@sentry/profiling-node": "^11.10.0",
+    "@sentry/react-router": "^11.10.0",
     "@syncfusion/ej2-base": "^35.1.37",
     "@syncfusion/ej2-material3-theme": "^35.1.42",
     "@syncfusion/ej2-react-buttons": "^35.1.41",

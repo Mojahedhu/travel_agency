@@ -118,6 +118,7 @@ const getUser = async () => {
       email: userDoc.email,
       imageUrl: userDoc.imageUrl,
       dateJoined: userDoc.$createdAt,
+      status: userDoc.status,
     };
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -125,7 +126,7 @@ const getUser = async () => {
   }
 };
 
-const getUsers = async (limit: number, offset: number) => {
+const getAllUsers = async (limit: number, offset: number) => {
   try {
     const { rows: users, total } = await database.listRows({
       databaseId,
@@ -148,5 +149,5 @@ export {
   loginWidthGoogle,
   logoutUser,
   getUser,
-  getUsers,
+  getAllUsers,
 };
