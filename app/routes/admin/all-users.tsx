@@ -8,10 +8,12 @@ import {
 import { getAllUsers, getUser } from "../../appwrite/auth";
 import type { Route } from "./+types/all-users";
 import { cn, formatDate } from "../../lib/utils";
+import { redirect } from "react-router";
 
-export const loader = async () => {
+export const clientLoader = async () => {
   const user = await getUser();
-  if (user.status !== "admin") return;
+  if (!user) return redirect("/sign-in");
+  if (user.status !== "admin") return redirect("/");
   const { users, total } = await getAllUsers(10, 0);
   return { users, total };
 };
@@ -34,6 +36,7 @@ const AllUsers = ({ loaderData }: Route.ComponentProps) => {
             template={({ name, imageUrl }: UserData) => (
               <div className="flex items-center gap-1.5 px-4">
                 <img
+                  alt=""
                   src={imageUrl}
                   className="aspect-square size-8 rounded-full"
                   referrerPolicy="no-referrer"
@@ -49,12 +52,12 @@ const AllUsers = ({ loaderData }: Route.ComponentProps) => {
             textAlign="Left"
           />
           <ColumnDirective
-            field="createdAt"
+            field="$createdAt"
             headerText="Date Joined"
             width={140}
             textAlign="Left"
-            template={({ createdAt }: { createdAt: string }) =>
-              formatDate(createdAt)
+            template={({ $createdAt }: { $createdAt: string }) =>
+              formatDate($createdAt)
             }
           />
           <ColumnDirective

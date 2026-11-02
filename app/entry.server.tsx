@@ -30,6 +30,8 @@ function injectTraceMetaTags(
 
   const metaBytes = encoder.encode(metaTags);
   let injected = false;
+  let bufferedTail: Uint8Array<ArrayBufferLike> = new Uint8Array(0);
+  const maxTailLength = HEAD_CLOSE.length - 1;
 
   return stream.pipeThrough(
     new TransformStream<Uint8Array, Uint8Array>({
@@ -38,15 +40,45 @@ function injectTraceMetaTags(
           controller.enqueue(chunk);
           return;
         }
-        const idx = findSequence(chunk, HEAD_CLOSE);
-        if (idx === -1) {
-          controller.enqueue(chunk);
-          return;
+
+        // Combine any retained bytes from previous chunk with current chunk
+        let combined: Uint8Array;
+        if (bufferedTail.length > 0) {
+          combined = new Uint8Array(bufferedTail.length + chunk.length);
+          combined.set(bufferedTail, 0);
+          combined.set(chunk, bufferedTail.length);
+          bufferedTail = new Uint8Array(0);
+        } else {
+          combined = chunk;
         }
+
+        const idx = findSequence(combined, HEAD_CLOSE);
+        if (idx === -1) {
+          // If combined is longer than maxTailLength, enqueue the safe prefix
+          // and retain the last few bytes in case `</head>` is split across chunk boundaries
+          if (combined.length > maxTailLength) {
+            const splitAt = combined.length - maxTailLength;
+            controller.enqueue(combined.subarray(0, splitAt));
+            bufferedTail = combined.slice(splitAt);
+          } else {
+            bufferedTail = combined;
+          }
+          return;
+          // controller.enqueue(chunk);
+          // return;
+        }
+
+        // Tag found: inject meta tags before `</head>`
         injected = true;
-        controller.enqueue(chunk.subarray(0, idx));
+        controller.enqueue(combined.subarray(0, idx));
         controller.enqueue(metaBytes);
-        controller.enqueue(chunk.subarray(idx));
+        controller.enqueue(combined.subarray(idx));
+      },
+      flush(controller) {
+        // Emit any leftover buffered bytes if </head> was never encountered
+        if (bufferedTail.length > 0) {
+          controller.enqueue(bufferedTail);
+        }
       },
     }),
   );
@@ -61,6 +93,7 @@ async function handleRequest(
 ) {
   // https://httpwg.org/specs/rfc9110.html#HEAD
   if (request.method.toUpperCase() === "HEAD") {
+    responseHeaders.set("Content-Type", "text/html");
     return new Response(null, {
       status: responseStatusCode,
       headers: responseHeaders,
