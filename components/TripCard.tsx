@@ -27,8 +27,8 @@ const TripCard = ({
       <img src={imageUrl} alt={name} />
 
       <article>
+        <h2 className="truncate">{name}</h2>
         <figure>
-          <h2 className="truncate">{name}</h2>
           <img
             src="/assets/icons/location-mark.svg"
             alt="location"
@@ -47,8 +47,8 @@ const TripCard = ({
                 text={getFirstWord(tag)}
                 cssClass={
                   index === 1
-                    ? "bg-pink-50! text-pink-500!"
-                    : "bg-success-50! text-success-700!"
+                    ? "bg-linear-0! bg-pink-50! text-pink-500!"
+                    : "bg-linear-0! bg-success-50! text-success-700!"
                 }
               />
             ))}

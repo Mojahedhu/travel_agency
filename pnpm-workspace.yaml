@@ -1,2 +1,4 @@
+allowBuilds:
+  '@sentry/node-cpu-profiler': true
 overrides:
   typescript: "7.0.2"
