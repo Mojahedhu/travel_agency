@@ -27,6 +27,7 @@
     "@tailwindcss/vite": "^4.3.3",
     "appwrite": "^29.2.0",
     "clsx": "^2.1.1",
+    "country-flag-emoji-polyfill": "^0.1.10",
     "dayjs": "^1.11.23",
     "isbot": "^5",
     "react": "^19.3.1",
