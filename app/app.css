@@ -6,6 +6,7 @@
 @theme {
   --font-figtree: "Figtree", sans-serif;
   --font-inter: "Inter", sans-serif;
+  --font-flags: "Twemoji Country Flags", ui-sans-serif, system-ui, sans-serif;
   --color-dark-100: #1f1f36;
   --color-dark-200: #141627;
   --color-dark-300: #101828;
@@ -129,7 +130,8 @@
     div {
       @apply relative flex w-full flex-col gap-2.5 px-6;
     }
-    label {
+    label,
+    p {
       @apply text-sm font-normal text-gray-100;
     }
   }
@@ -450,7 +452,7 @@
   @apply text-sm font-normal text-gray-100;
 }
 @utility form-input {
-  @apply border-light-400 text-dark-300 rounded-xl border p-3.5 text-base font-normal;
+  @apply border-light-400 text-dark-300 focus:outline-success-700 rounded-xl border p-3.5 text-base font-normal;
 }
 @utility comboBox-popup {
   @apply shadow-200 absolute top-24 z-10 h-[250px] w-full overflow-hidden rounded-xl border border-gray-200 bg-white md:max-w-[660px];
@@ -468,7 +470,7 @@
   @apply text-dark-200 hover:bg-primary-100 flex cursor-pointer items-center gap-2.5 rounded-lg px-3.5 py-[18px] text-xs font-normal hover:text-white md:text-lg;
 }
 @utility combo-box {
-  @apply border-light-400! text-dark-300! w-full rounded-xl! border! p-3.5! text-base! font-normal!;
+  @apply border-light-400! text-dark-300! focus:outline-success-700! w-full rounded-xl! border! p-3.5! text-base! font-normal focus:outline!;
 }
 
 html,
@@ -541,6 +543,17 @@ body {
 
 .e-input-group-icon {
   position: absolute;
-  top: 45px;
+  /* top: 45px; */
   right: 40px;
+}
+.e-clear-icon {
+  @apply absolute! top-1/2! left-40! -translate-y-1/2!;
+}
+
+.e-input-group {
+  @apply border-none! before:hidden after:hidden;
+}
+
+.e-ddl.e-popup .e-list-item {
+  @apply font-flags!;
 }
