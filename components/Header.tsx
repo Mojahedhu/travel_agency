@@ -35,14 +35,25 @@ const Header = ({ title, description, ctaText, ctaUrl }: HeaderProps) => {
       </article>
 
       {ctaText && ctaUrl && (
-        <Link to={ctaUrl}>
-          <ButtonComponent
+        <Link
+          to={ctaUrl}
+          className="button-class flex h-11 w-full items-center justify-center gap-2 md:w-60"
+        >
+          {/* <ButtonComponent
             type="button"
             className="button-class h-11! w-full! md:w-60"
           >
             <img src="/assets/icons/plus.svg" alt="plus" className="size-5" />
             <span className="p-16-semibold text-white">{ctaText}</span>
-          </ButtonComponent>
+          </ButtonComponent> */}
+
+          <img
+            src="/assets/icons/plus.svg"
+            alt=""
+            aria-hidden="true"
+            className="size-5"
+          />
+          <span className="p-16-semibold text-white">{ctaText}</span>
         </Link>
       )}
     </header>

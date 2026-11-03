@@ -102,6 +102,7 @@ const CreateTrip = () => {
                 handleChange("country", e.value || "");
               }}
               allowFiltering
+              allowCustom={false}
               filtering={(e) => {
                 const query = e.text.toLowerCase();
 
@@ -155,14 +156,15 @@ const CreateTrip = () => {
                   handleChange(key, e.value || "");
                 }}
                 allowFiltering
+                allowCustom={false}
                 filtering={(e) => {
                   const query = e.text.toLowerCase();
 
                   e.updateData(
-                    comboBoxItems[key].filter((item) =>
-                      item.toLowerCase().includes(query),
-                    ),
-                  )?.map((item: string) => ({ text: item, value: item }));
+                    comboBoxItems[key]
+                      .filter((item) => item.toLowerCase().includes(query))
+                      .map((item: string) => ({ text: item, value: item })),
+                  );
                 }}
                 className="combo-box"
               />

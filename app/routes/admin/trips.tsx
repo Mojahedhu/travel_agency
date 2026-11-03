@@ -1,9 +1,5 @@
 import { Header } from "../../../components";
 
-export const loader = async () => {
-  return "";
-};
-
 const trips = () => {
   return (
     <main className="all-users wrapper">
