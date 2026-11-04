@@ -17,6 +17,9 @@ type Pages = {
   "/sign-in": {
     params: {};
   };
+  "/api/create-trip": {
+    params: {};
+  };
   "/dashboard": {
     params: {};
   };
@@ -29,20 +32,29 @@ type Pages = {
   "/trips/create": {
     params: {};
   };
+  "/trips/:tripId": {
+    params: {
+      "tripId": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/sign-in" | "/dashboard" | "/all-users" | "/trips" | "/trips/create";
+    page: "/" | "/sign-in" | "/api/create-trip" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId";
   };
   "routes/root/sign-in.tsx": {
     id: "routes/root/sign-in";
     page: "/sign-in";
   };
+  "routes/api/create-trip.ts": {
+    id: "routes/api/create-trip";
+    page: "/api/create-trip";
+  };
   "routes/admin/admin-layout.tsx": {
     id: "routes/admin/admin-layout";
-    page: "/dashboard" | "/all-users" | "/trips" | "/trips/create";
+    page: "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId";
   };
   "routes/admin/dashboard.tsx": {
     id: "routes/admin/dashboard";
@@ -60,14 +72,20 @@ type RouteFiles = {
     id: "routes/admin/create-trip";
     page: "/trips/create";
   };
+  "routes/admin/trip-details.tsx": {
+    id: "routes/admin/trip-details";
+    page: "/trips/:tripId";
+  };
 };
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/root/sign-in": typeof import("./app/routes/root/sign-in.tsx");
+  "routes/api/create-trip": typeof import("./app/routes/api/create-trip.ts");
   "routes/admin/admin-layout": typeof import("./app/routes/admin/admin-layout.tsx");
   "routes/admin/dashboard": typeof import("./app/routes/admin/dashboard.tsx");
   "routes/admin/all-users": typeof import("./app/routes/admin/all-users.tsx");
   "routes/admin/trips": typeof import("./app/routes/admin/trips.tsx");
   "routes/admin/create-trip": typeof import("./app/routes/admin/create-trip.tsx");
+  "routes/admin/trip-details": typeof import("./app/routes/admin/trip-details.tsx");
 };

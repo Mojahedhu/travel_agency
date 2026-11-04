@@ -10,7 +10,8 @@ import { Header } from "../../../components";
 import { cn, formatKey } from "../../lib/utils";
 import { world_map } from "../../constants/world_map";
 import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
-import { load } from "@syncfusion/ej2-react-charts";
+import { account } from "../../appwrite/client";
+import { useNavigate } from "react-router";
 
 const CreateTrip = () => {
   const [formData, setFormData] = useState<TripFormData>({
@@ -24,6 +25,8 @@ const CreateTrip = () => {
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -49,10 +52,52 @@ const CreateTrip = () => {
       return;
     }
 
+    const user = await account.get();
+    if (!user.$id) {
+      setError("User not authenticated");
+      setLoading(false);
+      return;
+    }
+
+    // 👉 1. Generate a temporary, secure JWT from the active Appwrite session
+    const { jwt } = await account.createJWT();
+
     try {
-      await new Promise((res) => setTimeout(res, 2000));
+      const response = await fetch("/api/create-trip", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          // 👉 2. Pass the JWT to your server
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify({
+          country: formData.country,
+          numberOfDays: formData.duration,
+          travelStyle: formData.travelStyle,
+          interests: formData.interest,
+          budget: formData.budget,
+          groupType: formData.groupType,
+        }),
+      });
+
+      const result: CreateTripResponse = await response.json();
+
+      // 👉 Handle 400 / 401 / 500 responses from the backend
+      if (!response.ok) {
+        // 1. If there's an issues list with messages, join them; otherwise use error
+        let errorMessage = result.error || "Failed to generate trip.";
+        if (result.issues && result.issues.length > 0) {
+          errorMessage = result.issues.map((i) => i.message).join(" • ");
+        }
+        setError(errorMessage);
+        return;
+      }
+
+      if (result?.id) navigate(`/trips/${result.id}`);
+      else console.error("Failed to generate a trip. No ID returned.");
     } catch (error) {
-      console.log(error);
+      console.log("Error generate trip", error);
+      setError(error || "A network error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -192,7 +237,7 @@ const CreateTrip = () => {
 
           <div className="h-px w-full bg-gray-100" />
 
-          {error && (
+          {/* {error && (
             <div
               id="form-error"
               className="error"
@@ -200,6 +245,27 @@ const CreateTrip = () => {
               aria-live="assertive"
             >
               <p>{error}</p>
+            </div>
+          )} */}
+          {error && (
+            <div
+              id="form-error"
+              className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+              role="alert"
+              aria-live="assertive"
+            >
+              <svg
+                className="size-5 shrink-0 text-red-500"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="font-medium">{error}</p>
             </div>
           )}
 

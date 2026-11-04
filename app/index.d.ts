@@ -113,7 +113,26 @@ declare interface DashboardStats {
   };
 }
 
+declare interface ApiErrorResponse {
+  error: string;
+  issues?: {
+    field: string;
+    message: string;
+  }[];
+}
+
 declare interface CreateTripResponse {
+  id?: string;
+  error?: string;
+  issues?: {
+    field: string;
+    message: string;
+  }[];
+}
+
+declare interface CreateTripResponse {
+  issues: any;
+  error: string;
   id?: string;
 }
 
