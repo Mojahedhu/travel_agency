@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   budgetOptions,
+  countries,
   groupTypes,
   interests,
   travelStyles,
@@ -19,7 +20,10 @@ export const CreateTripRequestSchema = z.object({
     .string("Country is required.")
     .trim()
     .min(1, "Country name cannot be empty.")
-    .max(100, "Country name is too long."),
+    .max(100, "Country name is too long.")
+    .refine((val) => countries.some((c) => c.value === val), {
+      message: "Invalid country. Select a country from the list.",
+    }),
 
   numberOfDays: z
     .number("Number of days is required")

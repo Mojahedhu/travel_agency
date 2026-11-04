@@ -52,17 +52,17 @@ const CreateTrip = () => {
       return;
     }
 
-    const user = await account.get();
-    if (!user.$id) {
-      setError("User not authenticated");
-      setLoading(false);
-      return;
-    }
-
-    // 👉 1. Generate a temporary, secure JWT from the active Appwrite session
-    const { jwt } = await account.createJWT();
-
     try {
+      const user = await account.get();
+      if (!user.$id) {
+        setError("User not authenticated");
+        setLoading(false);
+        return;
+      }
+
+      // 👉 1. Generate a temporary, secure JWT from the active Appwrite session
+      const { jwt } = await account.createJWT();
+
       const response = await fetch("/api/create-trip", {
         method: "POST",
         headers: {
@@ -97,7 +97,7 @@ const CreateTrip = () => {
       else console.error("Failed to generate a trip. No ID returned.");
     } catch (error) {
       console.log("Error generate trip", error);
-      setError(error || "A network error occurred. Please try again.");
+      setError("A network error occurred. Please try again.");
     } finally {
       setLoading(false);
     }

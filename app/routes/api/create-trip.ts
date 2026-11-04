@@ -2,21 +2,52 @@ import { type ActionFunctionArgs, data as res } from "react-router";
 import { GoogleGenAI } from "@google/genai";
 
 import { appwriteConfig } from "../../appwrite/client";
-import { ID } from "appwrite";
+import { ID, Query } from "appwrite";
 import { createSessionClient } from "../../appwrite/server";
 import { CreateTripRequestSchema } from "../../lib/validations/trip";
+
+const { databaseId, tripCollectionId, userCollectionId } = appwriteConfig;
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   // 1. Verify User on the Server
   const { user, database } = await createSessionClient(request);
-  if (!user) {
+  if (!user || !database) {
     return res(
       { error: "Unauthorized: You must be logged in to create a trip." },
       { status: 401 },
     );
   }
 
-  const rawBody = await request.json();
+  // 2. Verify Admin Role / Status (Forbidden if not admin)
+
+  const { rows, total } = await database.listRows({
+    databaseId,
+    tableId: userCollectionId,
+    queries: [Query.equal("accountId", user.$id), Query.limit(1)],
+  });
+  const userDoc = total > 0 ? (rows[0] as unknown as UserData) : null;
+  if (userDoc?.status !== "admin") {
+    return res(
+      { error: "Forbidden: You do not have permission to generate trips." },
+      { status: 403 },
+    );
+  }
+
+  let rawBody: unknown;
+  try {
+    rawBody = await request.json();
+  } catch {
+    return res(
+      {
+        error: "Request body must be valid JSON.",
+        issues: [
+          { field: "form", message: "Request body must be valid JSON." },
+        ],
+      },
+      { status: 400 },
+    );
+  }
+
   // 1. Safe parsing with Zod
   const validationResult = CreateTripRequestSchema.safeParse(rawBody);
 
@@ -41,8 +72,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   // 3. Now safely use user.$id from the verified server session!
   const verifiedUserId = user.$id;
 
-  const { databaseId, tripCollectionId } = appwriteConfig;
-
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
   const unsplashApiKey = process.env.UNSPLASH_ACCESS_KEY!;
 
@@ -61,7 +90,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         "budget": "${budget}",
         "travelStyle": "${travelStyle}",
         "country": "${country}",
-        "interests": ${interests},
+        "interests": "${interests}",
         "groupType": "${groupType}",
         "bestTimeToVisit": [
           '🌸 Season (from month to month): reason to visit',
@@ -107,6 +136,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const imageResponse = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(`${country} ${interests} ${travelStyle}`)}&client_id=${unsplashApiKey}`,
     );
+
+    if (!imageResponse.ok) {
+      throw new Error(
+        `Failed to fetch images from Unsplash: ${imageResponse.status} ${imageResponse.statusText}`,
+      );
+    }
 
     const data = await imageResponse.json();
 

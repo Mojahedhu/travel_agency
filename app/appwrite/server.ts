@@ -1,9 +1,12 @@
-import { Account, TablesDB } from "appwrite";
-import { account, appwriteConfig, client, database } from "./client";
+import { Account, Client, TablesDB } from "appwrite";
+import { appwriteConfig } from "./client";
 
-const { projectId } = appwriteConfig;
+const { projectId, endpointUrl } = appwriteConfig;
 
 export async function createSessionClient(request: Request) {
+  const client = new Client().setEndpoint(endpointUrl).setProject(projectId);
+  const account = new Account(client);
+  const database = new TablesDB(client);
   // 1. Check for Authorization header (Bearer <JWT>)
   const authHeader = request.headers.get("Authorization");
   const jwt = authHeader?.startsWith("Bearer ")
@@ -23,7 +26,11 @@ export async function createSessionClient(request: Request) {
         new RegExp(`(?:^|;\\s*)a_session_${projectId}_legacy=([^;]*)`),
       )?.[1];
     if (sessionToken) {
-      client.setSession(decodeURIComponent(sessionToken));
+      try {
+        client.setSession(decodeURIComponent(sessionToken));
+      } catch {
+        return { account: null, database: null, user: null };
+      }
     } else {
       return { account: null, database: null, user: null };
     }
