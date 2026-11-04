@@ -1,4 +1,4 @@
-import { Query } from "appwrite";
+import { AppwriteException, Query } from "appwrite";
 import { appwriteConfig, database } from "./client";
 
 const { databaseId, tripCollectionId } = appwriteConfig;
@@ -21,16 +21,16 @@ export const getAllTrips = async (limit: number, offset: number) => {
 };
 
 export const getTripById = async (tripId: string) => {
-  const trip = await database.getRow({
-    databaseId,
-    tableId: tripCollectionId,
-    rowId: tripId,
-  });
-
-  if (!trip.$id) {
-    console.error("Trip not fount");
-    return null;
+  try {
+    return await database.getRow({
+      databaseId,
+      tableId: tripCollectionId,
+      rowId: tripId,
+    });
+  } catch (error) {
+    if (error instanceof AppwriteException && error.code === 404) {
+      return null;
+    }
+    throw error;
   }
-
-  return trip;
 };

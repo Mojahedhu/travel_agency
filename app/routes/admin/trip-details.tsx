@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs } from "react-router";
+import { redirect, type LoaderFunctionArgs } from "react-router";
 import { getAllTrips, getTripById } from "../../appwrite/trip";
 import { cn, getFirstWord, parseTripData } from "../../lib/utils";
 import type { Route } from "./+types/trip-details";
@@ -8,23 +8,32 @@ import {
   ChipListComponent,
   ChipsDirective,
 } from "@syncfusion/ej2-react-buttons";
+import { getUser } from "../../appwrite/auth";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const clientLoader = async ({ params }: LoaderFunctionArgs) => {
+  const user = await getUser();
+  if (!user) return redirect("/sign-in");
+  if (user.status !== "admin") return redirect("/");
+
   const { tripId } = params;
   if (!tripId) throw new Error("Trip ID is required");
 
   const [trip, trips] = await Promise.all([
     getTripById(tripId),
-    getAllTrips(4, 0),
+    getAllTrips(4, 0).catch((error) => {
+      console.error("Failed to load popular trips:", error);
+      return { allTrips: [], total: 0 };
+    }),
   ]);
+
+  if (!trip) throw new Response("Trip not found", { status: 404 });
 
   return {
     trip,
-    allTrips: trips.allTrips.map(({ $id, tripDetails, imageUrls }) => ({
-      id: $id,
-      ...parseTripData(tripDetails),
-      imageUrls: imageUrls ?? [],
-    })),
+    allTrips: trips.allTrips.flatMap(({ $id, tripDetails, imageUrls }: any) => {
+      const parsed = parseTripData(tripDetails);
+      return parsed ? [{ id: $id, ...parsed, imageUrls: imageUrls ?? [] }] : [];
+    }),
   };
 };
 
@@ -35,7 +44,7 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
   const {
     name,
     duration,
-    itinerary,
+    itinerary: storedItinerary,
     travelStyle,
     groupType,
     budget,
@@ -46,6 +55,10 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
     weatherInfo,
     country,
   } = tripData || {};
+
+  const itinerary: DayPlan[] = Array.isArray(storedItinerary)
+    ? storedItinerary
+    : [];
 
   const allTrips = loaderData.allTrips as Trip[] | [];
 
