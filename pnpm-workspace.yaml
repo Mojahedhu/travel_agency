@@ -1,4 +1,7 @@
 allowBuilds:
+  '@google/genai': true
   '@sentry/node-cpu-profiler': true
+  protobufjs: true
 overrides:
   typescript: "7.0.2"
+   
