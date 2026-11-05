@@ -41,11 +41,16 @@ export const clientLoader = async () => {
       getAllUsers(4, 0),
     ]);
 
-  const allTrips = trips.allTrips.map(({ $id, tripDetails, imageUrls }) => ({
-    id: $id,
-    ...parseTripData(tripDetails),
-    imageUrls: imageUrls ?? [],
-  }));
+  const allTrips = trips.allTrips.map(({ $id, tripDetails, imageUrls }) => {
+    const parsed = parseTripData(tripDetails);
+    return parsed
+      ? {
+          ...parseTripData(tripDetails),
+          id: $id,
+          imageUrls: imageUrls ?? [],
+        }
+      : [];
+  });
 
   const mappedUsers: UsersItineraryCount[] = allUsers.users.map(
     ({ imageUrl, name, $id, accountId }) => {
@@ -82,7 +87,7 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
   const { totalUsers, usersJoined, totalTrips, tripsCreated, userRole } =
     dashboardStats;
 
-  const trips = allTrips.map(({ imageUrls, interests, name }) => ({
+  const trips = (allTrips as Trip[])?.map(({ imageUrls, interests, name }) => ({
     imageUrl: imageUrls[0],
     name,
     interest: interests,
@@ -133,7 +138,7 @@ const Dashboard = ({ loaderData }: Route.ComponentProps) => {
       </section>
 
       <section className="trip-grid">
-        {allTrips.map(
+        {(allTrips as Trip[])?.map(
           ({
             id,
             name,

@@ -1,3 +1,4 @@
+import { Query } from "appwrite";
 import { parseTripData } from "../lib/utils";
 import { appwriteConfig, database } from "./client";
 
@@ -14,21 +15,53 @@ type FilterByDate = (
 
 const { databaseId, userCollectionId, tripCollectionId } = appwriteConfig;
 
+const PAGE_SIZE = 100; // max allowed limit per batch in Appwrite
+
+async function fetchAllRows(
+  tableId: string,
+): Promise<{ rows: Document[]; total: number }> {
+  let allRows: Document[] = [];
+  let lastId: string | null = null;
+  let total = 0;
+
+  while (true) {
+    const queries = [Query.limit(PAGE_SIZE)];
+    if (lastId) {
+      queries.push(Query.cursorAfter(lastId));
+    }
+
+    const res = await database.listRows({
+      databaseId,
+      tableId,
+      queries,
+    });
+
+    total = res.total;
+    allRows = allRows.concat(res.rows);
+
+    if (res.rows.length < PAGE_SIZE) {
+      break;
+    }
+
+    lastId = res.rows[res.rows.length - 1].$id;
+  }
+
+  return { rows: allRows, total };
+}
+
 export const getUsersAndTripsStat = async (): Promise<DashboardStats> => {
   const d = new Date();
   const startCurrent = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
-  const prevStart = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
-  const prevEnd = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+  const prevStart = new Date(
+    d.getFullYear(),
+    d.getMonth() - 1,
+    1,
+  ).toISOString();
+  const prevEnd = new Date(d.getFullYear(), d.getMonth(), 0).toISOString();
 
   const [users, trips] = await Promise.all([
-    database.listRows({
-      databaseId,
-      tableId: userCollectionId,
-    }),
-    database.listRows({
-      databaseId,
-      tableId: tripCollectionId,
-    }),
+    fetchAllRows(userCollectionId),
+    fetchAllRows(tripCollectionId),
   ]);
 
   const filteredByDate: FilterByDate = (items, key, start, end) =>
@@ -102,10 +135,7 @@ export const getUsersAndTripsStat = async (): Promise<DashboardStats> => {
 };
 
 export const getUserGrowthPerDay = async () => {
-  const users = await database.listRows({
-    databaseId,
-    tableId: userCollectionId,
-  });
+  const users = await fetchAllRows(userCollectionId);
 
   const userGrowth = users.rows.reduce(
     (acc: Record<string, number>, user: Document) => {
@@ -113,6 +143,7 @@ export const getUserGrowthPerDay = async () => {
       const day = data.toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
+        year: "numeric",
       });
       acc[day] = (acc[day] || 0) + 1;
       return acc;
@@ -127,10 +158,7 @@ export const getUserGrowthPerDay = async () => {
 };
 
 export const getTripsCreatedPerDay = async () => {
-  const trips = await database.listRows({
-    databaseId,
-    tableId: tripCollectionId,
-  });
+  const trips = await fetchAllRows(tripCollectionId);
 
   const tripGrowth = trips.rows.reduce(
     (acc: Record<string, number>, trip: Document) => {
@@ -152,10 +180,7 @@ export const getTripsCreatedPerDay = async () => {
 };
 
 export const getTripsByTravelStyle = async () => {
-  const trips = await database.listRows({
-    databaseId,
-    tableId: tripCollectionId,
-  });
+  const trips = await fetchAllRows(tripCollectionId);
 
   const travelStyleCount = trips.rows.reduce(
     (acc: Record<string, number>, trip: Document) => {
