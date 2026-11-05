@@ -9,7 +9,8 @@ import { PagerComponent } from "@syncfusion/ej2-react-grids";
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const limit = 8;
   const url = new URL(request.url);
-  const page = parseInt(url.searchParams.get("page") || "1", 10);
+  const parsedPage = parseInt(url.searchParams.get("page") || "1", 10);
+  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const offset = (page - 1) * limit;
   const { allTrips, total } = await getAllTrips(limit, offset);
 
