@@ -111,6 +111,13 @@ declare interface DashboardStats {
     currentMonth: number;
     lastMonth: number;
   };
+  userTripCounts: Record<
+    string,
+    {
+      name: string;
+      count: number;
+    }
+  >[];
 }
 
 declare interface ApiErrorResponse {
