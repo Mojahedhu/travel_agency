@@ -206,11 +206,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       });
     } catch (error) {
       // Rollback / cleanup: delete orphan row if Stripe product creation or DB update fails
-      await database.deleteRow({
-        databaseId,
-        tableId: tripCollectionId,
-        rowId: result.$id,
-      });
+      // await database.deleteRow({
+      //   databaseId,
+      //   tableId: tripCollectionId,
+      //   rowId: result.$id,
+      // });
       throw error;
     }
 
