@@ -2,10 +2,9 @@ import { Link, redirect, type LoaderFunctionArgs } from "react-router";
 import { getAllTrips, getTripById } from "../../appwrite/trip";
 import { cn, getFirstWord, parseTripData } from "../../lib/utils";
 import type { Route } from "./+types/travel-detail";
-import { Line } from "@syncfusion/ej2-react-maps";
+
 import { InfoPill, TripCard } from "../../../components";
 import {
-  ButtonComponent,
   ChipDirective,
   ChipListComponent,
   ChipsDirective,
@@ -23,12 +22,23 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     getAllTrips(4, 0),
   ]);
 
+  if (!trip) {
+    throw new Response("Trip Not Found", { status: 404 });
+  }
+
+  const parsedTripData = parseTripData(trip.tripDetails);
+  if (!parsedTripData || !Array.isArray(parsedTripData.itinerary)) {
+    throw new Response("Trip details are incomplete or invalid", {
+      status: 404,
+    });
+  }
+
   return {
     trip,
     allTrips: trips.allTrips.flatMap(({ $id, tripDetails, imageUrls }) => {
       const parsed = parseTripData(tripDetails);
 
-      return parsed ? { ...parsed, $id, imageUrls: imageUrls ?? [] } : [];
+      return parsed ? { ...parsed, id: $id, imageUrls: imageUrls ?? [] } : [];
     }),
   };
 };
@@ -42,7 +52,7 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
   const {
     name,
     duration,
-    itinerary,
+    itinerary = [],
     travelStyle,
     groupType,
     budget,
@@ -96,7 +106,7 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
           </header>
 
           <section className="gallery">
-            {imageUrls?.map((url: string, i) => (
+            {imageUrls?.map((url: string, i: number) => (
               <img
                 key={"imag-" + i}
                 src={url}
@@ -166,7 +176,7 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
           </p>
 
           <ul className="itinerary">
-            {itinerary.map(({ day, location, activities }: DayPlan, i) => (
+            {itinerary?.map(({ day, location, activities }: DayPlan, i) => (
               <li key={"dayPlan-" + i}>
                 <h3>
                   Day {day} : {location}
@@ -201,7 +211,7 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
             </section>
           ))}
 
-          <a href={paymentLink} className="flex">
+          {/* <a href={paymentLink} className="flex">
             <span className="button-class relative py-4">
               <span className="p-16-semibold text-white">
                 Pay to join the trip
@@ -213,7 +223,35 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
                 </span>
               )}
             </span>
-          </a>
+          </a> */}
+
+          {paymentLink ? (
+            <a
+              href={paymentLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex"
+            >
+              <span className="button-class py-4">
+                <span className="p-16-semibold text-white">
+                  Pay to join the trip
+                </span>
+                <span className="price-pill">{estimatedPrice}</span>
+              </span>
+            </a>
+          ) : (
+            <div className="flex" aria-disabled="true">
+              <span className="button-class relative cursor-not-allowed py-4 opacity-70">
+                <span className="p-16-semibold text-white">
+                  Pay to join the trip
+                </span>
+                <span className="price-pill">{estimatedPrice}</span>
+                <span className="absolute -inset-4 z-2 flex items-center justify-center rounded-xl bg-black/30 text-2xl font-extrabold text-white">
+                  Not available now
+                </span>
+              </span>
+            </div>
+          )}
         </section>
       </div>
 
