@@ -3,23 +3,37 @@ import {
   ColumnDirective,
   GridComponent,
   ColumnsDirective,
+  PagerComponent,
 } from "@syncfusion/ej2-react-grids";
 
 import { getAllUsers, getUser } from "../../appwrite/auth";
 import type { Route } from "./+types/all-users";
 import { cn, formatDate } from "../../lib/utils";
-import { redirect } from "react-router";
+import { redirect, type LoaderFunctionArgs } from "react-router";
+import { useState } from "react";
 
-export const clientLoader = async () => {
+export const clientLoader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getUser();
   if (!user) return redirect("/sign-in");
   if (user.status !== "admin") return redirect("/");
-  const { users, total } = await getAllUsers(10, 0);
-  return { users, total };
+  const limit = 10;
+  const url = new URL(request.url);
+  const parsedPage = parseInt(url.searchParams.get("page") || "1", 10);
+  const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const offset = (page - 1) * limit;
+  const { users, total } = await getAllUsers(limit, offset);
+  return { users, total, page };
 };
 
 const AllUsers = ({ loaderData }: Route.ComponentProps) => {
-  const { users } = loaderData;
+  const { users, page } = loaderData;
+
+  const [currentPage, setCurrentPage] = useState(page);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.location.search = `?page=${page}`;
+  };
   return (
     <main className="dashboard wrapper">
       <Header
@@ -91,6 +105,16 @@ const AllUsers = ({ loaderData }: Route.ComponentProps) => {
           />
         </ColumnsDirective>
       </GridComponent>
+
+      <PagerComponent
+        totalRecordsCount={loaderData.total}
+        currentPage={currentPage}
+        pageSize={10}
+        click={(args) => {
+          handlePageChange(args.currentPage);
+        }}
+        cssClass="mb-4!"
+      />
     </main>
   );
 };

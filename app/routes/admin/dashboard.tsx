@@ -41,11 +41,11 @@ export const clientLoader = async () => {
       getAllUsers(4, 0),
     ]);
 
-  const allTrips = trips.allTrips.map(({ $id, tripDetails, imageUrls }) => {
+  const allTrips = trips.allTrips.flatMap(({ $id, tripDetails, imageUrls }) => {
     const parsed = parseTripData(tripDetails);
     return parsed
       ? {
-          ...parseTripData(tripDetails),
+          ...parsed,
           id: $id,
           imageUrls: imageUrls ?? [],
         }

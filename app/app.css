@@ -380,7 +380,7 @@
     @apply flex h-full min-h-[230px] flex-col justify-between gap-3.5 p-[30px];
   }
   .featured {
-    @apply flex flex-col gap-[30px] md:flex-row;
+    @apply mt-10 flex flex-col gap-[30px] md:flex-row;
     article {
       @apply flex w-full flex-col gap-[30px];
     }

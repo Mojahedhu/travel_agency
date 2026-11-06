@@ -1,4 +1,4 @@
-import { useSearchParams, type LoaderFunctionArgs } from "react-router";
+import { type LoaderFunctionArgs } from "react-router";
 import { Header, TripCard } from "../../../components";
 import { getAllTrips } from "../../appwrite/trip";
 import { parseTripData } from "../../lib/utils";
@@ -21,15 +21,15 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       imageUrls: imageUrls ?? [],
     })),
     total,
+    page,
   };
 };
 
 const Trips = ({ loaderData }: Route.ComponentProps) => {
   const trips = loaderData.trips as Trip[] | [];
+  const { page } = loaderData;
 
-  const [searchParams] = useSearchParams();
-  const initialPage = Number(searchParams.get("page") || "1");
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [currentPage, setCurrentPage] = useState(page);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
