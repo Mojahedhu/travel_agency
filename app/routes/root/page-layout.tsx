@@ -1,14 +1,14 @@
 import { Outlet, redirect } from "react-router";
-import { account } from "../../appwrite/client";
-import { getExistingUser } from "../../appwrite/auth";
+
 import { RootNavbar } from "../../../components";
+import { getUser } from "../../appwrite/auth";
 
 export const clientLoader = async () => {
   try {
-    const user = await account.get();
+    const user = await getUser();
     if (!user) return redirect("/sign-in");
 
-    return await getExistingUser(user.$id);
+    return user;
   } catch (error) {
     console.log("Error fetching user: ", error);
     throw redirect("/sign-in");

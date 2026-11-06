@@ -1,4 +1,4 @@
-import { Link, useSearchParams, type LoaderFunctionArgs } from "react-router";
+import { Link, type LoaderFunctionArgs } from "react-router";
 
 import { getAllTrips } from "../../appwrite/trip";
 import { parseTripData } from "../../lib/utils";
@@ -6,6 +6,7 @@ import type { Route } from "./+types/travel-page";
 import { useState } from "react";
 import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
 import { FeaturedDestination, Header, TripCard } from "../../../components";
+import { PagerComponent } from "@syncfusion/ej2-react-grids";
 
 const destinationList = [
   {
@@ -60,20 +61,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const { allTrips, total } = await getAllTrips(limit, offset);
 
   return {
-    trips: allTrips.map(({ $id, tripDetails, imageUrls }) => {
+    trips: allTrips.flatMap(({ $id, tripDetails, imageUrls }) => {
       const parsed = parseTripData(tripDetails);
       return parsed ? { ...parsed, id: $id, imageUrls: imageUrls || [] } : [];
     }),
     total,
+    page,
   };
 };
 
 const TravelPage = ({ loaderData }: Route.ComponentProps) => {
-  const { trips } = loaderData;
+  const { trips, page, total } = loaderData;
 
-  const [searchParams] = useSearchParams();
-  const initialPage = Number(searchParams.get("page") || "1");
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [currentPage, setCurrentPage] = useState(page);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -185,7 +185,33 @@ const TravelPage = ({ loaderData }: Route.ComponentProps) => {
             ),
           )}
         </div>
+        <PagerComponent
+          totalRecordsCount={total}
+          currentPage={currentPage}
+          pageSize={8}
+          click={(args) => {
+            handlePageChange(args.currentPage);
+          }}
+          cssClass="mb-4!"
+        />
       </section>
+
+      <footer className="h-28 bg-white">
+        <div className="wrapper footer-container">
+          <Link to={"/"}>
+            <img src="/assets/icons/logo.svg" alt="logo" className="size-7.5" />
+            <h1>Worldvisto</h1>
+          </Link>
+
+          <div>
+            {["Terms & Conditions", "Privacy Policy"].map((item) => (
+              <Link to="/" key={item} className="hover:underline">
+                {item}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </footer>
     </main>
   );
 };

@@ -9,11 +9,7 @@ import {
 import { getAllUsers, getUser } from "../../appwrite/auth";
 import type { Route } from "./+types/all-users";
 import { cn, formatDate } from "../../lib/utils";
-import {
-  redirect,
-  useSearchParams,
-  type LoaderFunctionArgs,
-} from "react-router";
+import { redirect, type LoaderFunctionArgs } from "react-router";
 import { useState } from "react";
 
 export const clientLoader = async ({ request }: LoaderFunctionArgs) => {
@@ -26,14 +22,13 @@ export const clientLoader = async ({ request }: LoaderFunctionArgs) => {
   const page = Number.isInteger(parsedPage) && parsedPage > 0 ? parsedPage : 1;
   const offset = (page - 1) * limit;
   const { users, total } = await getAllUsers(limit, offset);
-  return { users, total };
+  return { users, total, page };
 };
 
 const AllUsers = ({ loaderData }: Route.ComponentProps) => {
-  const { users } = loaderData;
-  const [searchParams] = useSearchParams();
-  const initialPage = Number(searchParams.get("page") || "1");
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const { users, page } = loaderData;
+
+  const [currentPage, setCurrentPage] = useState(page);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
