@@ -1,17 +1,42 @@
 import { useEffect } from "react";
-import { Link, type LoaderFunctionArgs } from "react-router";
+import { Link, redirect, type LoaderFunctionArgs } from "react-router";
 import confetti from "canvas-confetti";
 import { LEFT_CONFETTI, RIGHT_CONFETTI } from "../../constants";
 import type { Route } from "./+types/payment-success";
+import { getTripById } from "../../appwrite/trip";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
-  return params;
+  const { tripId } = params;
+  if (!tripId) {
+    throw redirect("/");
+  }
+  // 1. Verify that the trip exists in the database
+  const trip = await getTripById(tripId);
+  if (!trip) {
+    throw new Response("Trip Not Found", { status: 404 });
+  }
+  // 2. Verify Stripe payment completion (if Stripe is active in your environment)
+  // Example Stripe verification:
+  /*
+  const paymentIntents = await stripe.paymentIntents.search({
+    query: `metadata['tripId']:'${tripId}' AND status:'succeeded'`,
+  });
+  if (!paymentIntents.data || paymentIntents.data.length === 0) {
+    // Booking is unpaid or unverified
+    throw redirect(`/travel/${tripId}`);
+  }
+  */
+  return { tripId, trip };
 };
 
 const PaymentSuccess = ({ loaderData }: Route.ComponentProps) => {
   useEffect(() => {
     confetti(LEFT_CONFETTI);
     confetti(RIGHT_CONFETTI);
+
+    return () => {
+      confetti.reset();
+    };
   }, []);
   return (
     <main className="payment-success wrapper">

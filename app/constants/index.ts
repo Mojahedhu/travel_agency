@@ -128,6 +128,7 @@ export const CONFETTI_SETTINGS = {
   spread: 60, // Spread of the confetti burst
   colors: ["#ff0", "#ff7f00", "#ff0044", "#4c94f4", "#f4f4f4"], // Confetti colors
   decay: 0.95, // Gravity decay of the confetti
+  disableForReducedMotion: true,
 };
 
 export const LEFT_CONFETTI = {
