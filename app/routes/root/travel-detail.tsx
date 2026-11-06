@@ -211,20 +211,6 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
             </section>
           ))}
 
-          {/* <a href={paymentLink} className="flex">
-            <span className="button-class relative py-4">
-              <span className="p-16-semibold text-white">
-                Pay to join the trip
-              </span>
-              <span className="price-pill">{estimatedPrice}</span>
-              {!paymentLink && (
-                <span className="absolute -inset-4 z-2 flex cursor-not-allowed items-center justify-center rounded-xl bg-black/30 text-2xl font-extrabold text-white">
-                  Not available now
-                </span>
-              )}
-            </span>
-          </a> */}
-
           {paymentLink ? (
             <a
               href={paymentLink}
