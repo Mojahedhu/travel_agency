@@ -27,7 +27,9 @@ const Header = ({ title, description, ctaText, ctaUrl }: HeaderProps) => {
         <p
           className={cn(
             "text-lg font-normal text-gray-100",
-            location.pathname === "/" ? "text-base" : "text-sm",
+            location.pathname === "/"
+              ? "text-base md:text-lg"
+              : "text-sm md:text-lg",
           )}
         >
           {description}

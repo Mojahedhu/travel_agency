@@ -76,6 +76,14 @@ type RouteFiles = {
     id: "routes/admin/trip-details";
     page: "/trips/:tripId";
   };
+  "routes/root/page-layout.tsx": {
+    id: "routes/root/page-layout";
+    page: "/";
+  };
+  "routes/root/travel-page.tsx": {
+    id: "routes/root/travel-page";
+    page: "/";
+  };
 };
 
 type RouteModules = {
@@ -88,4 +96,6 @@ type RouteModules = {
   "routes/admin/trips": typeof import("./app/routes/admin/trips.tsx");
   "routes/admin/create-trip": typeof import("./app/routes/admin/create-trip.tsx");
   "routes/admin/trip-details": typeof import("./app/routes/admin/trip-details.tsx");
+  "routes/root/page-layout": typeof import("./app/routes/root/page-layout.tsx");
+  "routes/root/travel-page": typeof import("./app/routes/root/travel-page.tsx");
 };

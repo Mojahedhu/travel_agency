@@ -45,7 +45,7 @@ export const clientLoader = async () => {
     const parsed = parseTripData(tripDetails);
     return parsed
       ? {
-          ...parseTripData(tripDetails),
+          ...parsed,
           id: $id,
           imageUrls: imageUrls ?? [],
         }
