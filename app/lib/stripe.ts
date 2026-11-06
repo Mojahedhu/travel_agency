@@ -1,4 +1,4 @@
-import Stripe from "stripe";
+// import Stripe from "stripe";
 import { appwriteConfig } from "../appwrite/client";
 import type { TablesDB } from "appwrite";
 import { parseTripData } from "./utils";
@@ -6,7 +6,7 @@ import { parseTripData } from "./utils";
 const { databaseId, tripCollectionId } = appwriteConfig;
 
 // No apiVersion: uses the version bundled with your installed SDK
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+// export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export const createProduct = async (
   name: string,

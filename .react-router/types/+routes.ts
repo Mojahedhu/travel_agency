@@ -20,6 +20,9 @@ type Pages = {
   "/api/create-trip": {
     params: {};
   };
+  "/api/retry-trip-payment": {
+    params: {};
+  };
   "/dashboard": {
     params: {};
   };
@@ -37,12 +40,17 @@ type Pages = {
       "tripId": string;
     };
   };
+  "/travel/:tripId": {
+    params: {
+      "tripId": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/sign-in" | "/api/create-trip" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId";
+    page: "/" | "/sign-in" | "/api/create-trip" | "/api/retry-trip-payment" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId" | "/travel/:tripId";
   };
   "routes/root/sign-in.tsx": {
     id: "routes/root/sign-in";
@@ -51,6 +59,10 @@ type RouteFiles = {
   "routes/api/create-trip.ts": {
     id: "routes/api/create-trip";
     page: "/api/create-trip";
+  };
+  "routes/api/retry-trip-payment.ts": {
+    id: "routes/api/retry-trip-payment";
+    page: "/api/retry-trip-payment";
   };
   "routes/admin/admin-layout.tsx": {
     id: "routes/admin/admin-layout";
@@ -78,11 +90,15 @@ type RouteFiles = {
   };
   "routes/root/page-layout.tsx": {
     id: "routes/root/page-layout";
-    page: "/";
+    page: "/" | "/travel/:tripId";
   };
   "routes/root/travel-page.tsx": {
     id: "routes/root/travel-page";
     page: "/";
+  };
+  "routes/root/travel-detail.tsx": {
+    id: "routes/root/travel-detail";
+    page: "/travel/:tripId";
   };
 };
 
@@ -90,6 +106,7 @@ type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/root/sign-in": typeof import("./app/routes/root/sign-in.tsx");
   "routes/api/create-trip": typeof import("./app/routes/api/create-trip.ts");
+  "routes/api/retry-trip-payment": typeof import("./app/routes/api/retry-trip-payment.ts");
   "routes/admin/admin-layout": typeof import("./app/routes/admin/admin-layout.tsx");
   "routes/admin/dashboard": typeof import("./app/routes/admin/dashboard.tsx");
   "routes/admin/all-users": typeof import("./app/routes/admin/all-users.tsx");
@@ -98,4 +115,5 @@ type RouteModules = {
   "routes/admin/trip-details": typeof import("./app/routes/admin/trip-details.tsx");
   "routes/root/page-layout": typeof import("./app/routes/root/page-layout.tsx");
   "routes/root/travel-page": typeof import("./app/routes/root/travel-page.tsx");
+  "routes/root/travel-detail": typeof import("./app/routes/root/travel-detail.tsx");
 };
