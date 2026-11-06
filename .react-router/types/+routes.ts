@@ -45,12 +45,17 @@ type Pages = {
       "tripId": string;
     };
   };
+  "/travel/:tripId/success": {
+    params: {
+      "tripId": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/sign-in" | "/api/create-trip" | "/api/retry-trip-payment" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId" | "/travel/:tripId";
+    page: "/" | "/sign-in" | "/api/create-trip" | "/api/retry-trip-payment" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId" | "/travel/:tripId" | "/travel/:tripId/success";
   };
   "routes/root/sign-in.tsx": {
     id: "routes/root/sign-in";
@@ -90,7 +95,7 @@ type RouteFiles = {
   };
   "routes/root/page-layout.tsx": {
     id: "routes/root/page-layout";
-    page: "/" | "/travel/:tripId";
+    page: "/" | "/travel/:tripId" | "/travel/:tripId/success";
   };
   "routes/root/travel-page.tsx": {
     id: "routes/root/travel-page";
@@ -99,6 +104,10 @@ type RouteFiles = {
   "routes/root/travel-detail.tsx": {
     id: "routes/root/travel-detail";
     page: "/travel/:tripId";
+  };
+  "routes/root/payment-success.tsx": {
+    id: "routes/root/payment-success";
+    page: "/travel/:tripId/success";
   };
 };
 
@@ -116,4 +125,5 @@ type RouteModules = {
   "routes/root/page-layout": typeof import("./app/routes/root/page-layout.tsx");
   "routes/root/travel-page": typeof import("./app/routes/root/travel-page.tsx");
   "routes/root/travel-detail": typeof import("./app/routes/root/travel-detail.tsx");
+  "routes/root/payment-success": typeof import("./app/routes/root/payment-success.tsx");
 };

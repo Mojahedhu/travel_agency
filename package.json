@@ -27,6 +27,7 @@
     "@syncfusion/ej2-react-splitbuttons": "^35.1.37",
     "@tailwindcss/vite": "^4.3.3",
     "appwrite": "^29.2.0",
+    "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
     "country-flag-emoji-polyfill": "^0.1.10",
     "dayjs": "^1.11.23",
