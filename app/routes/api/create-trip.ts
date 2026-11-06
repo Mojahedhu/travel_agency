@@ -5,6 +5,8 @@ import { appwriteConfig } from "../../appwrite/client";
 import { ID, Query } from "appwrite";
 import { createSessionClient } from "../../appwrite/server";
 import { CreateTripRequestSchema } from "../../lib/validations/trip";
+import { parseTripData } from "../../lib/utils";
+import { createProduct } from "../../lib/stripe";
 
 const { databaseId, tripCollectionId, userCollectionId } = appwriteConfig;
 
@@ -157,6 +159,25 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         tripDetails: JSON.stringify(trip),
         imageUrls,
         userId: verifiedUserId,
+      },
+    });
+
+    const tripDetails = parseTripData(result.tripDetails) as Trip;
+    const tripPrice = parseInt(tripDetails.estimatedPrice.replace("$", ""), 10);
+    const paymentLink = await createProduct(
+      tripDetails.name,
+      tripDetails.description,
+      imageUrls,
+      tripPrice,
+      result.$id,
+    );
+
+    await database.updateRow({
+      databaseId,
+      tableId: tripCollectionId,
+      rowId: result.$id,
+      data: {
+        payment_link: paymentLink.url,
       },
     });
 
