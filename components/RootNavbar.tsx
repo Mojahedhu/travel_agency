@@ -7,6 +7,7 @@ import {
 } from "react-router";
 import { cn } from "../app/lib/utils";
 import { logoutUser } from "../app/appwrite/auth";
+import ToggleButton from "./ToggleButton";
 
 const RootNavbar = () => {
   const navigate = useNavigate();
@@ -59,6 +60,7 @@ const RootNavbar = () => {
               className="size-6"
             />
           </button>
+          <ToggleButton />
         </aside>
       </header>
     </nav>
