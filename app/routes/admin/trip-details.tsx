@@ -2,7 +2,12 @@ import { redirect, type LoaderFunctionArgs } from "react-router";
 import { getAllTrips, getTripById } from "../../appwrite/trip";
 import { cn, getFirstWord, parseTripData } from "../../lib/utils";
 import type { Route } from "./+types/trip-details";
-import { Header, InfoPill, TripCard } from "../../../components";
+import {
+  Header,
+  InfoPill,
+  PaymentLinkPanel,
+  TripCard,
+} from "../../../components";
 import {
   ChipDirective,
   ChipListComponent,
@@ -38,6 +43,9 @@ export const clientLoader = async ({ params }: LoaderFunctionArgs) => {
 };
 
 const TripDetails = ({ loaderData }: Route.ComponentProps) => {
+  const trip = loaderData?.trip;
+  const tripId = trip?.$id;
+
   const imageUrls = loaderData?.trip?.imageUrls || [];
   const tripData = parseTripData(loaderData?.trip?.tripDetails);
 
@@ -85,6 +93,14 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
         title="Travel Details"
         description="View and edit AI-generated travel plans"
       />
+      {/* Render the isolated child component keyed by tripId */}
+      {tripId && (
+        <PaymentLinkPanel
+          key={tripId}
+          tripId={tripId}
+          initialPaymentLink={trip?.payment_link || null}
+        />
+      )}
 
       <section className="wrapper-md container">
         <header>

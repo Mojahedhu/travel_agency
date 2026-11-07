@@ -6,3 +6,4 @@ export { default as TripCard } from "./TripCard";
 export { default as InfoPill } from "./InfoPill";
 export { default as RootNavbar } from "./RootNavbar";
 export { default as FeaturedDestination } from "./FeaturedDestination";
+export { default as PaymentLinkPanel } from "./PaymentLinkPanel";
