@@ -14,5 +14,5 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { tripId } = await request.json();
 
   const { url } = await ensureTripPaymentLink({ database, tripId });
-  return data({ success: true, payment_link: url });
+  return data({ success: true, payment_link: url, isActive: true });
 };
