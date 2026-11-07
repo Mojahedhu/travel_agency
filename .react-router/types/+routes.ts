@@ -50,12 +50,17 @@ type Pages = {
       "tripId": string;
     };
   };
+  "/*": {
+    params: {
+      "*": string;
+    };
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/sign-in" | "/api/create-trip" | "/api/retry-trip-payment" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId" | "/travel/:tripId" | "/travel/:tripId/success";
+    page: "/" | "/sign-in" | "/api/create-trip" | "/api/retry-trip-payment" | "/dashboard" | "/all-users" | "/trips" | "/trips/create" | "/trips/:tripId" | "/travel/:tripId" | "/travel/:tripId/success" | "/*";
   };
   "routes/root/sign-in.tsx": {
     id: "routes/root/sign-in";
@@ -109,6 +114,10 @@ type RouteFiles = {
     id: "routes/root/payment-success";
     page: "/travel/:tripId/success";
   };
+  "routes/root/not-found.tsx": {
+    id: "routes/root/not-found";
+    page: "/*";
+  };
 };
 
 type RouteModules = {
@@ -126,4 +135,5 @@ type RouteModules = {
   "routes/root/travel-page": typeof import("./app/routes/root/travel-page.tsx");
   "routes/root/travel-detail": typeof import("./app/routes/root/travel-detail.tsx");
   "routes/root/payment-success": typeof import("./app/routes/root/payment-success.tsx");
+  "routes/root/not-found": typeof import("./app/routes/root/not-found.tsx");
 };

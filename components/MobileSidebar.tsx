@@ -17,8 +17,16 @@ const MobileSidebar = () => {
           <h1>Worldvisto</h1>
         </Link>
 
-        <button onClick={toggleSidebar} aria-label="Open navigation">
-          <img src="/assets/icons/menu.svg" className="size-7" alt="menu" />
+        <button
+          className="cursor-pointer"
+          onClick={toggleSidebar}
+          aria-label="Open navigation"
+        >
+          <img
+            src="/assets/icons/menu.svg"
+            className="size-7 dark:invert"
+            alt="menu"
+          />
         </button>
       </header>
 

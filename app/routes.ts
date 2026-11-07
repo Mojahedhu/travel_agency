@@ -21,4 +21,6 @@ export default [
     route("/travel/:tripId", "routes/root/travel-detail.tsx"),
     route("/travel/:tripId/success", "routes/root/payment-success.tsx"),
   ]),
+  // Catch-all: renders the custom 404 / error page for any unmatched URL
+  route("*", "routes/root/not-found.tsx"),
 ] satisfies RouteConfig;

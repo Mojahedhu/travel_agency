@@ -4,6 +4,7 @@ import confetti from "canvas-confetti";
 import { LEFT_CONFETTI, RIGHT_CONFETTI } from "../../constants";
 import type { Route } from "./+types/payment-success";
 import { getTripById } from "../../appwrite/trip";
+import { stripe } from "../../lib/stripe";
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const { tripId } = params;
@@ -17,7 +18,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   }
   // 2. Verify Stripe payment completion (if Stripe is active in your environment)
   // Example Stripe verification:
-  /*
+
   const paymentIntents = await stripe.paymentIntents.search({
     query: `metadata['tripId']:'${tripId}' AND status:'succeeded'`,
   });
@@ -25,7 +26,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     // Booking is unpaid or unverified
     throw redirect(`/travel/${tripId}`);
   }
-  */
+
   return { tripId, trip };
 };
 
