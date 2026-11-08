@@ -4,15 +4,22 @@ import { ensureTripPaymentLink } from "../../lib/stripe";
 
 // Usage in the frontend
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { user, database } = await createSessionClient(request);
-  if (!user || !database) {
+  try {
+    const { user, database } = await createSessionClient(request);
+    if (!user || !database) {
+      return data(
+        { error: "Unauthorized: You must be logged in to create a trip." },
+        { status: 401 },
+      );
+    }
+    const { tripId } = await request.json();
+    const { url } = await ensureTripPaymentLink({ database, tripId });
+    return data({ success: true, payment_link: url, isActive: true });
+  } catch (err: any) {
+    console.error("Retry payment link error:", err);
     return data(
-      { error: "Unauthorized: You must be logged in to create a trip." },
-      { status: 401 },
+      { error: err?.message || "Failed to recreate payment link." },
+      { status: 500 },
     );
   }
-  const { tripId } = await request.json();
-
-  const { url } = await ensureTripPaymentLink({ database, tripId });
-  return data({ success: true, payment_link: url, isActive: true });
 };
