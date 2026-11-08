@@ -2,6 +2,7 @@ import cn from "clsx";
 import { useState } from "react";
 import { useRevalidator } from "react-router";
 import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
+import { account } from "../app/appwrite/client";
 interface PaymentLinkPanelProps {
   tripId: string;
   initialPaymentLink: string | null;
@@ -53,9 +54,23 @@ const PaymentLinkPanel = ({
     setErrorMessage(null);
 
     try {
+      const user = await account.get();
+      if (!user) {
+        setErrorMessage("User not authenticated");
+        setIsLoading(false);
+        return;
+      }
+
+      // Generate a temporary , secure JWt from the active Appwrite session
+      const { jwt } = await account.createJWT();
+
       const response = await fetch("/api/retry-trip-payment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // Pass the JWT to your server
+          Authorization: `Bearer ${jwt}`,
+        },
         body: JSON.stringify({ tripId }),
       });
 
