@@ -1,1 +1,0 @@
-(function(){try{var e=typeof globalThis<`u`?globalThis:typeof window<`u`?window:typeof global<`u`?global:typeof self<`u`?self:{};e.SENTRY_RELEASE={id:`bc0b28f25e3fe73b8f5da68e7e39a6bfdc263592`}}catch{}})();export{t as clientLoader}from"./dashboard-DzHIo_ZK.js";

@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 !app\app-original.css
 
+# React Router & Build outputs
+.react-router/
+build/
+
