@@ -747,14 +747,21 @@ html.dark .e-grid .e-headertext {
    .e-grid .e-row:nth-child(odd) { background-color: #f9fbfc }
    without !important. The Syncfusion theme stylesheet DOES use
    !important for some row rules, so we match it here. */
-html.dark .e-grid .e-row:nth-child(odd),
-html.dark .e-grid .e-row:nth-child(odd) .e-rowcell,
-html.dark .e-grid .e-row:nth-child(odd) .e-templatecell {
+/* 1. Unselected row striping */
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(odd),
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(odd) .e-rowcell,
+html.dark
+  .e-grid
+  .e-row:not(.e-selectionbackground):nth-child(odd)
+  .e-templatecell {
   background-color: var(--color-light-200) !important; /* #141627 */
 }
-html.dark .e-grid .e-row:nth-child(even),
-html.dark .e-grid .e-row:nth-child(even) .e-rowcell,
-html.dark .e-grid .e-row:nth-child(even) .e-templatecell {
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(even),
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(even) .e-rowcell,
+html.dark
+  .e-grid
+  .e-row:not(.e-selectionbackground):nth-child(even)
+  .e-templatecell {
   background-color: var(--color-surface) !important; /* #1f1f36 */
 }
 
@@ -764,8 +771,24 @@ html.dark .e-grid .e-rowcell {
 }
 
 /* Grid row hover */
-html.dark .e-grid .e-row:hover .e-rowcell {
+/* 2. Unselected row hover */
+html.dark .e-grid .e-row:not(.e-selectionbackground):hover .e-rowcell {
   background-color: var(--color-light-300) !important; /* #2e2c48 */
+}
+
+/* 3. Selected row state (active, blurred, or hovered) */
+html.dark .e-grid .e-row.e-selectionbackground,
+html.dark .e-grid .e-row.e-selectionbackground .e-rowcell,
+html.dark .e-grid .e-row.e-selectionbackground .e-templatecell,
+html.dark .e-grid .e-row.e-selectionbackground:hover,
+html.dark .e-grid .e-row.e-selectionbackground:hover .e-rowcell,
+html.dark .e-grid .e-row.e-selectionbackground:hover .e-templatecell {
+  background-color: color-mix(
+    in srgb,
+    var(--color-primary-100) 25%,
+    var(--color-surface)
+  ) !important;
+  color: #ffffff !important;
 }
 
 /* ── 10. Syncfusion Sidebar ──────────────────────────────────*/
@@ -884,6 +907,12 @@ html.dark .e-chart .e-chart-secondary-element > svg {
   background-color: #1f1f36 !important;
 }
 
+/* Recolor the map background rectangles in dark mode. */
+html.dark .e-maps rect[id$="_MapBorder"],
+html.dark .e-maps rect[id$="_MapAreaBorder"] {
+  fill: var(--color-surface) !important;
+}
+
 /* Chart axis lines and tick marks */
 html.dark .e-chart line {
   stroke: #2e2c48 !important; /* --color-light-100 — dark elevated */
@@ -965,21 +994,62 @@ html.dark .e-input-group.e-control-wrapper input.e-input {
   color: var(--color-dark-100) !important;
 }
 
-/* ComboBox dropdown list popup */
+/* ── ComboBox / Dropdown popup container (darker menu) ─────────────────── */
+html.dark .e-popup.e-ddl,
+html.dark .e-popup.e-combobox,
+html.dark .e-ddl.e-popup,
+html.dark .e-dropdownbase,
+html.dark .e-dropdownbase .e-content,
+html.dark .e-dropdownbase ul.e-list-parent {
+  background: #141627 !important; /* deep dark background */
+  background-image: none !important; /* clears Material3 white gradient */
+  border-color: #2e2c48 !important;
+  color: #f9fbfc !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ── ComboBox dropdown list items ──────────────────────────────────────── */
 html.dark .e-dropdownbase .e-list-item {
-  background-color: var(--color-surface) !important;
-  color: var(--color-dark-100) !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: #f9fbfc !important;
+  border-color: transparent !important;
 }
 
+/* ── Hover, active, and focused states (distinct elevated dark) ────────── */
+html.dark .e-dropdownbase .e-list-item:hover,
 html.dark .e-dropdownbase .e-list-item.e-hover,
-html.dark .e-dropdownbase .e-list-item.e-active {
-  background-color: var(--color-light-300) !important; /* #2e2c48 */
-  color: var(--color-dark-100) !important;
+html.dark .e-dropdownbase .e-list-item.e-active,
+html.dark .e-dropdownbase .e-list-item.e-item-focus,
+html.dark .e-dropdownbase .e-list-item.e-active.e-hover {
+  background: #2e2c48 !important; /* elevated tone for highlight */
+  background-image: none !important;
+  color: #ffffff !important;
 }
 
-html.dark .e-popup.e-ddl {
-  background-color: var(--color-surface) !important;
-  border-color: var(--color-light-100) !important;
+/* Global scrollbar when dark theme is active */
+html.dark {
+  scrollbar-width: thin;
+  scrollbar-color: #2e2c48 #1f1f36;
+}
+
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #1f1f36;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #1f1f36;
+  border-radius: 4px;
+  border: 2px solid #141627;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3d3b5a;
 }
 
 .sf-license-validation-banner {

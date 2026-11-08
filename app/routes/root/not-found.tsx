@@ -13,10 +13,27 @@ import {
  *    other unhandled error).
  *  - `useRouteError()` gives us the actual error object so we can distinguish
  *    404s from unexpected runtime errors and render different copy.
+ *
  */
+
+export function loader() {
+  throw new Response(null, { status: 404 });
+}
+
 export function ErrorBoundary() {
   const error = useRouteError();
   const navigate = useNavigate();
+
+  const handleGoBack = () => {
+    // In React Router / standard HTML5 history, idx > 0 indicates a previous entry in this session
+    try {
+      navigate(-1);
+    } catch (error) {
+      console.log("Fallback");
+      // Fallback to the established home route
+      navigate("/", { replace: true });
+    }
+  };
 
   /* ── derive human-readable copy from the error ───────────────────── */
   const is404 = !error || (isRouteErrorResponse(error) && error.status === 404);
@@ -93,14 +110,14 @@ export function ErrorBoundary() {
         <div className="flex w-full flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={handleGoBack}
             className="button-class-secondary text-dark-100 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-white/90 px-6 font-semibold shadow-sm transition hover:bg-white"
           >
             <img
               src="/assets/icons/arrow-left.svg"
               alt=""
               aria-hidden="true"
-              className="size-4"
+              className="size-4 dark:invert"
             />
             <span className="p-16-semibold">Go Back</span>
           </button>

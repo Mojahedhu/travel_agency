@@ -1,12 +1,36 @@
+import { useEffect, useState } from "react";
+
 const ToggleButton = () => {
+  // 1. Initialize state from the <html> element
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    // Sync state on initial mount
+    setIsDark(document.documentElement.classList.contains("dark"));
+    // 2. Listen for theme toggles triggered by any ToggleButton
+    const onThemeChange = () => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    };
+    window.addEventListener("theme-change", onThemeChange);
+    return () => {
+      window.removeEventListener("theme-change", onThemeChange);
+    };
+  }, []);
+
+  const handleToggle = () => {
+    const next = !document.documentElement.classList.contains("dark");
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("theme", next ? "dark" : "light");
+    // Tell all other ToggleButtons on the page to update
+    window.dispatchEvent(new Event("theme-change"));
+  };
+
   return (
     <button
+      type="button"
       aria-label="Toggle dark mode"
+      aria-pressed={isDark}
       className="theme-toggle"
-      onClick={() => {
-        const isDark = document.documentElement.classList.toggle("dark");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-      }}
+      onClick={handleToggle}
     >
       {/* Moon icon — shown in light mode */}
       <svg

@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
+import type { MouseEventHandler } from "react";
 polyfillCountryFlagEmojis();
 
 registerLicense(import.meta.env.VITE_SYNCFUSION_LICENSE_KEY);
@@ -30,7 +31,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,7 +41,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
             __html: `
                 (function(){
                   try {
-                    let s = localStorage.getItem('theme');
+                       let s = null;
+                    try {
+                      s = localStorage.getItem('theme');
+                    } catch(e){}
                     let p = window.matchMedia('(prefers-color-scheme: dark)').matches;
                     if (s === 'dark' || (!s && p)) document.documentElement.classList.add('dark');
                   } catch(e){}
@@ -71,6 +75,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     Sentry.captureException(error);
   }
 
+  const handleGoBack = (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      history.back();
+    } catch {
+      window.location.href = "/";
+    }
+  };
+
   const is404 = isRouteErrorResponse(error) && error.status === 404;
   const statusCode = isRouteErrorResponse(error) ? error.status : 500;
   const headline = is404 ? "404" : String(statusCode);
@@ -85,7 +98,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   return (
     <main
-      className="relative flex h-screen w-full items-center justify-center overflow-hidden"
+      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden"
       aria-labelledby="root-error-heading"
     >
       {/* Full-screen background */}
@@ -140,17 +153,14 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              history.back();
-            }}
-            className="text-dark-100 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-white/90 px-6 font-semibold shadow-sm transition hover:bg-white"
+            onClick={handleGoBack}
+            className="text-dark-100 bg-surface/90 hover:bg-surface flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-lg px-6 font-semibold shadow-sm transition"
           >
             <img
               src="/assets/icons/arrow-left.svg"
               alt=""
               aria-hidden="true"
-              className="size-4"
+              className="text-dark-100 size-4 dark:invert"
             />
             <span className="p-16-semibold">Go Back</span>
           </a>
