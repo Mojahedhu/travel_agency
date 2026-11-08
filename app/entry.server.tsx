@@ -1,4 +1,4 @@
-import "../instrument.server";
+import "../instrument.server.mjs";
 import type { EntryContext, RouterContextProvider } from "react-router";
 import { ServerRouter } from "react-router";
 import { isbot } from "isbot";

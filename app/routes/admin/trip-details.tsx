@@ -37,7 +37,7 @@ export const clientLoader = async ({ params }: LoaderFunctionArgs) => {
     trip,
     allTrips: trips.allTrips.flatMap(({ $id, tripDetails, imageUrls }: any) => {
       const parsed = parseTripData(tripDetails);
-      return parsed ? [{ id: $id, ...parsed, imageUrls: imageUrls ?? [] }] : [];
+      return parsed ? [{ ...parsed, id: $id, imageUrls: imageUrls ?? [] }] : [];
     }),
   };
 };
@@ -118,7 +118,7 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
           </div>
         </header>
         <section className="gallery">
-          {imageUrls.map((url: string, i) => (
+          {imageUrls.map((url: string, i: number) => (
             <img
               src={url}
               key={"img" + i}
@@ -243,7 +243,7 @@ const TripDetails = ({ loaderData }: Route.ComponentProps) => {
                 key={id}
                 id={id}
                 name={name}
-                imageUrl={imageUrls}
+                imageUrl={imageUrls[0]}
                 location={itinerary?.[0]?.location ?? ""}
                 tags={[interests, travelStyle]}
                 price={estimatedPrice}

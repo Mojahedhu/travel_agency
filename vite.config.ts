@@ -29,5 +29,8 @@ export default defineConfig((config) => {
     ssr: {
       noExternal: [/@syncfusion/],
     },
+    build: {
+      cssMinify: false,
+    },
   };
 });

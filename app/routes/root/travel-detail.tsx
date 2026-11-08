@@ -201,7 +201,7 @@ const TravelDetail = ({ loaderData }: Route.ComponentProps) => {
                 <h3>{title}</h3>
 
                 <ul>
-                  {items.map((item) => (
+                  {items?.map((item) => (
                     <li key={item} className="grow">
                       {item}
                     </li>

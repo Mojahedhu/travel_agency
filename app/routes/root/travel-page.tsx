@@ -163,7 +163,7 @@ const TravelPage = ({ loaderData }: Route.ComponentProps) => {
         />
 
         <div className="trip-grid">
-          {(trips as Trip[])?.map(
+          {trips?.map(
             ({
               id,
               name,

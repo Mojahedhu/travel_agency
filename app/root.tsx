@@ -11,7 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { polyfillCountryFlagEmojis } from "country-flag-emoji-polyfill";
-import type { MouseEventHandler } from "react";
+
 polyfillCountryFlagEmojis();
 
 registerLicense(import.meta.env.VITE_SYNCFUSION_LICENSE_KEY);
