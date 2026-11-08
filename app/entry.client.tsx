@@ -2,10 +2,10 @@ import * as Sentry from "@sentry/react-router";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { HydratedRouter } from "react-router/dom";
-const dsa = import.meta.env.VITE_SENTRY_DSN;
-if (!dsa) {
+const dsn = import.meta.env.VITE_SENTRY_DSN;
+if (dsn) {
   Sentry.init({
-    dsn: dsa,
+    dsn: dsn,
     integrations: [
       // Registers and configures the Tracing integration,
       // which automatically instruments your application to monitor its

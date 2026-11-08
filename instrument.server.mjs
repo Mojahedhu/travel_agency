@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react-router";
 import { nodeProfilingIntegration } from "@sentry/profiling-node";
 const dsn = import.meta.env.VITE_SENTRY_DSN;
-if (!dsn) {
+if (dsn) {
   Sentry.init({
     dsn: dsn,
     // Enables Profiling
