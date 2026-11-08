@@ -167,7 +167,7 @@ export async function ensureTripPaymentLink({
           after_completion: {
             type: "redirect",
             redirect: {
-              url: `${process.env.APP_BASE_URL}/travel/${tripId}/success`,
+              url: `${process.env.APP_BASE_URL}/travel/${tripId}/success?session_id={CHECKOUT_SESSION_ID}`,
             },
           },
         });
