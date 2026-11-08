@@ -4,6 +4,7 @@ import { cn } from "../app/lib/utils";
 import clsx from "clsx";
 import { logoutUser } from "../app/appwrite/auth";
 import { useState } from "react";
+import ToggleButton from "./ToggleButton";
 
 type Active = {
   isActive: boolean;
@@ -30,10 +31,13 @@ const NavItems = ({ handleClick }: NavItemsProps) => {
 
   return (
     <section className="nav-items">
-      <Link to={"/"} className="link-logo">
-        <img src="/assets/icons/logo.svg" alt="logo" className="size-7.5" />
-        <h1>Worldvisto</h1>
-      </Link>
+      <div className="m-0 flex items-center justify-between p-0">
+        <Link to={"/"} className="link-logo">
+          <img src="/assets/icons/logo.svg" alt="logo" className="size-7.5" />
+          <h1>Worldvisto</h1>
+        </Link>
+        <ToggleButton />
+      </div>
       <div className="container">
         <nav>
           {sidebarItems.map(({ id, href, icon, label }) => (

@@ -86,11 +86,11 @@ const TravelPage = ({ loaderData }: Route.ComponentProps) => {
         <div>
           <section className="wrapper">
             <article>
-              <h1 className="p-72-bold text-dark-100">
+              <h1 className="p-72-bold text-[#1f1f36]">
                 Plan Your Trip with Ease
               </h1>
 
-              <p className="text-dark-100">
+              <p className="text-[#1f1f36]">
                 Customize your travel itinerary in minutes-pick your
                 destination, set your preferences, and explore with confidence.
               </p>

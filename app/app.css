@@ -42,6 +42,7 @@
   --background-image-card-4: url("/assets/images/card-img-4.png");
   --background-image-card-5: url("/assets/images/card-img-5.png");
   --background-image-card-6: url("/assets/images/card-img-6.png");
+  --background-image-not-found: url("/assets/images/sample1.jpg");
   --background-image-linear100: linear-gradient(
     105deg,
     rgba(207, 241, 255, 0.8) 14.17%,
@@ -556,4 +557,501 @@ body {
 
 .e-ddl.e-popup .e-list-item {
   @apply font-flags!;
+}
+
+/* ============================================================
+   DARK THEME — Tailwind v4 idiomatic approach (v6)
+   Append to the bottom of app/app.css.
+   Activate: add class="dark" to <html>.
+   ============================================================ */
+
+/* ── 1. Dark variant ─────────────────────────────────────────
+   Tells Tailwind v4: dark: = "inside a .dark ancestor".
+   Enables dark: in both @apply and JSX className.
+   ────────────────────────────────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── 2. New semantic surface token ───────────────────────────
+   One addition to the token system: a card/panel surface token.
+   Set to white in light mode; overridden to dark-100 below.
+   ────────────────────────────────────────────────────────── */
+@theme {
+  --color-surface: white;
+}
+
+/* ── 3. THE CORE — token redirect in .dark ───────────────────
+   This single block is the entire dark theme.
+   Every utility class that references these tokens — in JSX
+   className or @apply — automatically picks up the new value.
+   No per-selector overrides needed for token-based colors.
+   ────────────────────────────────────────────────────────── */
+.dark {
+  /* Text tokens: flip dark text → light */
+  --color-dark-100: #f9fbfc; /* text-dark-100 → near-white  */
+  --color-dark-200: #ecf2ef; /* text-dark-200 → off-white   */
+  --color-dark-300: #f9fbfc; /* text-dark-300 → near-white  */
+  --color-dark-400: #ecf2ef; /* text-dark-400 → off-white   */
+
+  /* Background/border tokens: flip light bg → dark */
+  --color-light-100: #2e2c48; /* border-light-100 → dark border   */
+  --color-light-200: #141627; /* bg-light-200    → dark page bg   */
+  --color-light-300: #2e2c48; /* bg-light-300    → dark elevated  */
+  --color-light-400: #2e2c48; /* border-light-400→ dark border    */
+  --color-light-500: #1a2a40; /* bg-light-500    → dark tinted    */
+
+  /* Gray tokens */
+  --color-gray-100: #9e9eb8; /* muted text — nudged up for WCAG AA on dark */
+  --color-gray-200: #2e2c48; /* border-gray-200 → dark border    */
+
+  /* Surface token: card/panel bg */
+  --color-surface: #1f1f36; /* bg-surface      → dark card bg   */
+}
+
+/* ── 4. html + body background ───────────────────────────────
+   ROOT CAUSE FIX (v6):
+   The original CSS is:
+     html, body { background-color: #f9fbfc; }
+   This targets BOTH html AND body with a raw hardcoded hex.
+   Two problems:
+     a) `html` itself is painted white — when body is shorter
+        than the viewport OR overflows, the white html bleeds through.
+     b) `var()` in our old override can resolve to the `:root`
+        fallback if the cascade order is wrong.
+   Solution: target `html.dark` directly + use HARDCODED values
+   (not var()) so there is ZERO dependency on CSS variable resolution.
+   ────────────────────────────────────────────────────────── */
+html.dark,
+html.dark body,
+html.dark .admin-layout .children {
+  background-color: #141627 !important; /* dark page bg — same as --color-light-200 dark value */
+  color: #f9fbfc; /* near-white — same as --color-dark-100 dark value */
+}
+
+/* ── 5. bg-white — the one built-in exception ────────────────
+   bg-white is a Tailwind built-in, not a custom property.
+   This single rule catches every element with className="bg-white"
+   in JSX (RootNavbar, travel-page footer, PaymentLinkPanel,
+   FeaturedDestination rating badge, all-users status badges).
+   ────────────────────────────────────────────────────────── */
+html.dark .bg-white {
+  background-color: var(--color-surface) !important; /* → #1f1f36 in dark */
+}
+
+/* ── 6. Component overrides ──────────────────────────────────
+   ONLY for the 5 component classes that inline `bg-white`
+   via @apply. The compiled CSS writes `background-color: #fff`
+   directly onto the component selector — no class attr exists
+   on the element for rule 5 above to target.
+
+   FIX: Use !important here to beat the compiled @apply output.
+   All text/border colors are already handled by the redirect.
+   ────────────────────────────────────────────────────────── */
+@layer components {
+  /* FIX #5: .trip-form uses @apply bg-white which compiles to
+     background-color: #fff at component layer specificity.
+     dark:bg-surface alone loses to it — need !important. */
+  .stats-card {
+    @apply dark:!bg-surface;
+  }
+  .sign-in-card {
+    @apply dark:!bg-surface;
+  }
+  .trip-form {
+    @apply dark:!bg-surface;
+  }
+  .trip-card {
+    @apply dark:!bg-surface;
+  }
+  .back-link {
+    @apply dark:!bg-surface;
+  }
+
+  /* Status badge: mix-blend-multiply only works on white backgrounds.
+     Tailwind v4 ships mix-blend-normal as a utility. */
+  .status-column {
+    @apply dark:mix-blend-normal;
+  }
+
+  /* Toggle button: border-light-400 and bg-light-300 are
+     auto-redirected to dark border/elevated. bg-surface for the face. */
+  .theme-toggle {
+    @apply flex-center border-light-400 hover:bg-light-300 dark:bg-surface dark:hover:bg-light-300 size-9 cursor-pointer rounded-full border bg-transparent transition-colors;
+  }
+}
+
+/* ── 7. Utility overrides ────────────────────────────────────
+   Same situation as components: utilities that inlined bg-white
+   via @apply need an explicit dark surface swap.
+   ────────────────────────────────────────────────────────── */
+@layer utilities {
+  /* form-input: bg is not explicitly set via @apply bg-white,
+     but it inherits white from browser. Dark surface overrides it. */
+  .form-input {
+    @apply dark:!bg-surface dark:text-dark-100;
+  }
+  .comboBox-popup {
+    @apply dark:!bg-surface;
+  }
+  .combo-box {
+    @apply dark:!bg-surface dark:!text-dark-100;
+  }
+
+  /* button-class-secondary inlines !bg-white */
+  .button-class-secondary {
+    @apply dark:!bg-surface;
+  }
+
+  /* Pills inline bg-white — swap to light-300 (now #2e2c48 in dark)
+     text-dark-100 is auto-redirected to #f9fbfc. */
+  .tripCard-pill {
+    @apply dark:!bg-light-300 dark:text-dark-100;
+  }
+  .price-pill {
+    @apply dark:!bg-light-300 dark:text-dark-100;
+  }
+}
+
+/* ── 8. Glassmorphism ────────────────────────────────────────
+   The translucent overlay uses surface color at 50% opacity.
+   ────────────────────────────────────────────────────────── */
+html.dark .glassmorphism {
+  background-color: color-mix(in srgb, var(--color-surface) 50%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* ── 9. Syncfusion Grid overrides ────────────────────────────
+   Third-party !important stylesheet requires !important counters.
+   All values reference the redirected @theme tokens —
+   automatically correct in dark context.
+   ────────────────────────────────────────────────────────── */
+html.dark .e-grid,
+html.dark .e-table {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-light-100) !important;
+  color: var(--color-dark-100) !important;
+}
+
+html.dark .e-grid .e-gridheader {
+  background-color: var(--color-light-200) !important;
+  border-color: var(--color-light-100) !important;
+}
+
+html.dark .e-grid .e-headercell,
+html.dark .e-grid .e-headertext {
+  color: var(--color-dark-200) !important;
+  background-color: var(--color-light-200) !important;
+}
+
+/* FIX #1: Odd rows were white — the original CSS has
+   .e-grid .e-row:nth-child(odd) { background-color: #f9fbfc }
+   without !important. The Syncfusion theme stylesheet DOES use
+   !important for some row rules, so we match it here. */
+/* 1. Unselected row striping */
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(odd),
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(odd) .e-rowcell,
+html.dark
+  .e-grid
+  .e-row:not(.e-selectionbackground):nth-child(odd)
+  .e-templatecell {
+  background-color: var(--color-light-200) !important; /* #141627 */
+}
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(even),
+html.dark .e-grid .e-row:not(.e-selectionbackground):nth-child(even) .e-rowcell,
+html.dark
+  .e-grid
+  .e-row:not(.e-selectionbackground):nth-child(even)
+  .e-templatecell {
+  background-color: var(--color-surface) !important; /* #1f1f36 */
+}
+
+html.dark .e-grid .e-rowcell {
+  color: var(--color-dark-100) !important;
+  border-color: var(--color-light-100) !important;
+}
+
+/* Grid row hover */
+/* 2. Unselected row hover */
+html.dark .e-grid .e-row:not(.e-selectionbackground):hover .e-rowcell {
+  background-color: var(--color-light-300) !important; /* #2e2c48 */
+}
+
+/* 3. Selected row state (active, blurred, or hovered) */
+html.dark .e-grid .e-row.e-selectionbackground,
+html.dark .e-grid .e-row.e-selectionbackground .e-rowcell,
+html.dark .e-grid .e-row.e-selectionbackground .e-templatecell,
+html.dark .e-grid .e-row.e-selectionbackground:hover,
+html.dark .e-grid .e-row.e-selectionbackground:hover .e-rowcell,
+html.dark .e-grid .e-row.e-selectionbackground:hover .e-templatecell {
+  background-color: color-mix(
+    in srgb,
+    var(--color-primary-100) 25%,
+    var(--color-surface)
+  ) !important;
+  color: #ffffff !important;
+}
+
+/* ── 10. Syncfusion Sidebar ──────────────────────────────────*/
+html.dark .e-sidebar.e-left {
+  background-color: var(--color-surface) !important;
+  border-right-color: var(--color-light-100) !important;
+}
+
+/* ── 11. Syncfusion Dropdown button + popup ──────────────────*/
+html.dark .e-dropdown-btn {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-light-100) !important;
+  color: var(--color-dark-100) !important;
+}
+
+html.dark .e-dropdown-popup ul {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-light-100) !important;
+  color: var(--color-dark-100) !important;
+}
+
+html.dark .e-dropdown-popup ul .e-item:hover {
+  background-color: var(--color-light-300) !important; /* #2e2c48 */
+}
+
+/* ── 12. Syncfusion Pager ────────────────────────────────────
+   Inactive items (page numbers, arrows) → muted gray pill style.
+   Active current page → primary blue (unchanged).
+   "1 of N pages" text → muted gray.
+   ────────────────────────────────────────────────────────── */
+html.dark .e-pager,
+html.dark .e-pagercontainer {
+  background-color: var(--color-surface) !important;
+  border-color: var(--color-light-100) !important;
+  color: #9e9eb8 !important; /* muted gray for count text */
+}
+
+/* Inactive numeric page buttons and nav arrows */
+html.dark .e-pager .e-numericitem,
+html.dark .e-pager .e-nextpage,
+html.dark .e-pager .e-prevpage,
+html.dark .e-pager .e-firstpage,
+html.dark .e-pager .e-lastpage,
+html.dark .e-pager .e-next.e-icons,
+html.dark .e-pager .e-prev.e-icons,
+html.dark .e-pager .e-first.e-icons,
+html.dark .e-pager .e-last.e-icons {
+  color: #9e9eb8 !important; /* muted gray icons/numbers */
+  background-color: #2e2c48 !important; /* slightly elevated surface */
+  border-color: transparent !important;
+  border-radius: 6px;
+}
+
+html.dark .e-pager .e-mnext,
+html.dark .e-pager .e-mprev,
+html.dark .e-pager .e-mfirst,
+html.dark .e-pager .e-mlast {
+  background-color: gray !important;
+}
+
+/* Hover state on inactive items */
+html.dark .e-pager .e-numericitem:hover,
+html.dark .e-pager .e-nextpage:hover,
+html.dark .e-pager .e-prevpage:hover,
+html.dark .e-pager .e-firstpage:hover,
+html.dark .e-pager .e-lastpage:hover {
+  background-color: #3d3b5a !important; /* slightly lighter on hover */
+  color: #f9fbfc !important;
+}
+
+/* Active / current page — keep primary blue */
+html.dark .e-pager .e-currentitem,
+html.dark .e-pager .e-numericitem.e-currentitem {
+  background-color: var(--color-primary-100) !important;
+  color: white !important;
+  border-radius: 6px;
+}
+
+/* "1 of N pages (N items)" count message */
+html.dark .e-pager .e-parentmsgbar,
+html.dark .e-pager .e-pagecountmsg,
+html.dark .e-pager .e-pagenomsg {
+  color: #9e9eb8 !important;
+}
+
+/* ── 13. Syncfusion Charts ───────────────────────────────────
+   ChartComponent renders into an SVG via JavaScript.
+   Syncfusion sets label `fill` as an INLINE SVG ATTRIBUTE (not CSS),
+   so CSS fill rules without !important are ignored entirely.
+   Fix: use a broad `html.dark .e-chart text { fill: ... !important }`
+   to override all inline SVG text — axis labels, axis titles,
+   legend text, tooltip text, data labels.
+   ────────────────────────────────────────────────────────── */
+html.dark .e-chart {
+  background-color: #1f1f36 !important; /* --color-surface */
+}
+
+/* THE KEY FIX: target ALL SVG text elements inside the chart.
+   Syncfusion sets fill inline as: fill="rgba(0,0,0,0.87)" or fill="#000"
+   The !important here beats the inline attribute. */
+html.dark .e-chart text,
+html.dark .e-chart tspan {
+  fill: #9e9eb8 !important; /* muted gray — readable on dark, not too bright */
+}
+
+/* Axis titles ("Day", "Travel Styles", "Count") —
+   make them slightly brighter than tick labels */
+html.dark .e-chart .e-chart-title text,
+html.dark .e-chart .e-title text {
+  fill: #f9fbfc !important; /* near-white — chart title */
+}
+
+/* The actual SVG element rendered by Syncfusion Charts */
+html.dark .e-chart > svg,
+html.dark .e-chart .e-chart-secondary-element > svg {
+  background-color: #1f1f36 !important;
+}
+
+/* Recolor the map background rectangles in dark mode. */
+html.dark .e-maps rect[id$="_MapBorder"],
+html.dark .e-maps rect[id$="_MapAreaBorder"] {
+  fill: var(--color-surface) !important;
+}
+
+/* Chart axis lines and tick marks */
+html.dark .e-chart line {
+  stroke: #2e2c48 !important; /* --color-light-100 — dark elevated */
+}
+
+/* Chart grid lines — keep subtle */
+html.dark .e-chart .e-major-gridline,
+html.dark .e-chart .e-minor-gridline {
+  stroke: #2e2c48 !important;
+  opacity: 0.6;
+}
+
+/* Legend icons text */
+html.dark .e-chart .e-legend-text {
+  fill: #9e9eb8 !important;
+}
+
+/* ── 14. Syncfusion Maps (World Map) ─────────────────────────
+   FIX #6: MapsComponent renders with a white SVG background.
+   We target both the container and the SVG layer inside.
+   ────────────────────────────────────────────────────────── */
+html.dark .e-maps {
+  background-color: var(--color-surface) !important;
+}
+
+html.dark .e-maps > svg,
+html.dark .e-maps .e-maps-container {
+  background-color: var(--color-surface) !important;
+}
+
+/* Map land fill — the light grey E5E5E5 set in JSX shapeSettings
+   is in the SVG `fill` attribute, which we can't override without JS.
+   We target the generated path elements directly. */
+html.dark .e-maps path[fill="#E5E5E5"],
+html.dark .e-maps path:not([fill="#EA382E"]) {
+  fill: var(--color-light-100) !important; /* #2e2c48 — dark land */
+  stroke: var(--color-light-200) !important;
+}
+
+/* ── 15. Syncfusion Chip List ────────────────────────────────
+   FIX #3: ChipListComponent renders .e-chip-list and .e-chip
+   with white background from the material3 stylesheet.
+   The chip colors in trip-details use inline cssClass (pink/blue/etc)
+   — those are !important overrides in JSX and are unaffected.
+   We only reset the DEFAULT chip bg for unlabelled chips.
+   ────────────────────────────────────────────────────────── */
+html.dark .e-chip-list {
+  background-color: transparent !important;
+}
+
+html.dark .e-chip-list .e-chip {
+  background-color: var(--color-light-300) !important; /* #2e2c48 */
+  color: var(--color-dark-100) !important; /* #f9fbfc */
+  border-color: var(--color-light-100) !important;
+}
+
+/* Chips that use their own color class (pink-50, primary-50, etc.)
+   are set via cssClass with !important in JSX — they win over this rule.
+   No change needed for them. */
+
+/* ── 16. Syncfusion ComboBox / Input ─────────────────────────
+   The .e-control covers both the input wrapper and the popup list.
+   FIX: Ensure the input field inside ComboBox is also dark.
+   ────────────────────────────────────────────────────────── */
+html.dark .e-control {
+  background-color: var(--color-surface) !important;
+  color: var(--color-dark-100) !important;
+}
+
+html.dark .e-input-group,
+html.dark .e-input-group.e-control-wrapper {
+  background-color: var(--color-surface) !important;
+  color: var(--color-dark-100) !important;
+}
+
+html.dark .e-input-group input.e-input,
+html.dark .e-input-group.e-control-wrapper input.e-input {
+  background-color: var(--color-surface) !important;
+  color: var(--color-dark-100) !important;
+}
+
+/* ── ComboBox / Dropdown popup container (darker menu) ─────────────────── */
+html.dark .e-popup.e-ddl,
+html.dark .e-popup.e-combobox,
+html.dark .e-ddl.e-popup,
+html.dark .e-dropdownbase,
+html.dark .e-dropdownbase .e-content,
+html.dark .e-dropdownbase ul.e-list-parent {
+  background: #141627 !important; /* deep dark background */
+  background-image: none !important; /* clears Material3 white gradient */
+  border-color: #2e2c48 !important;
+  color: #f9fbfc !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ── ComboBox dropdown list items ──────────────────────────────────────── */
+html.dark .e-dropdownbase .e-list-item {
+  background: transparent !important;
+  background-image: none !important;
+  color: #f9fbfc !important;
+  border-color: transparent !important;
+}
+
+/* ── Hover, active, and focused states (distinct elevated dark) ────────── */
+html.dark .e-dropdownbase .e-list-item:hover,
+html.dark .e-dropdownbase .e-list-item.e-hover,
+html.dark .e-dropdownbase .e-list-item.e-active,
+html.dark .e-dropdownbase .e-list-item.e-item-focus,
+html.dark .e-dropdownbase .e-list-item.e-active.e-hover {
+  background: #2e2c48 !important; /* elevated tone for highlight */
+  background-image: none !important;
+  color: #ffffff !important;
+}
+
+/* Global scrollbar when dark theme is active */
+html.dark {
+  scrollbar-width: thin;
+  scrollbar-color: #2e2c48 #1f1f36;
+}
+
+html.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #1f1f36;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #1f1f36;
+  border-radius: 4px;
+  border: 2px solid #141627;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #3d3b5a;
+}
+
+.sf-license-validation-banner {
+  display: none;
 }

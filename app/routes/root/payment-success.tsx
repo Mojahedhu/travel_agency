@@ -4,8 +4,9 @@ import confetti from "canvas-confetti";
 import { LEFT_CONFETTI, RIGHT_CONFETTI } from "../../constants";
 import type { Route } from "./+types/payment-success";
 import { getTripById } from "../../appwrite/trip";
+import { stripe } from "../../lib/stripe";
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const { tripId } = params;
   if (!tripId) {
     throw redirect("/");
@@ -17,15 +18,31 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   }
   // 2. Verify Stripe payment completion (if Stripe is active in your environment)
   // Example Stripe verification:
-  /*
-  const paymentIntents = await stripe.paymentIntents.search({
-    query: `metadata['tripId']:'${tripId}' AND status:'succeeded'`,
-  });
-  if (!paymentIntents.data || paymentIntents.data.length === 0) {
-    // Booking is unpaid or unverified
+  // Read SESSION_ID query params if passed by Stripe redirect
+
+  const url = new URL(request.url);
+  const sessionId = url.searchParams.get("session_id");
+
+  let isVerified = false;
+
+  if (sessionId) {
+    try {
+      const session = await stripe.checkout.sessions.retrieve(sessionId);
+      if (
+        session.payment_status === "paid" &&
+        session.metadata?.tripId === tripId
+      ) {
+        isVerified = true;
+      }
+    } catch (error) {
+      console.error("Failed to retrieve checkout session:", error);
+    }
+  }
+
+  // 2. If no valid session or session verification failed, redirect
+  if (!isVerified) {
     throw redirect(`/travel/${tripId}`);
   }
-  */
   return { tripId, trip };
 };
 
