@@ -32,5 +32,6 @@ export default defineConfig((config) => {
     build: {
       cssMinify: false,
     },
+    envPrefix: ["VITE_", "SENTRY_"],
   };
 });

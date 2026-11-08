@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/react-router";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { HydratedRouter } from "react-router/dom";
-const dsn = import.meta.env.VITE_SENTRY_DSN;
+const dsn = import.meta.env.VITE_SENTRY_DSN || import.meta.env.SENTRY_DSN;
 if (dsn) {
   Sentry.init({
     dsn: dsn,
