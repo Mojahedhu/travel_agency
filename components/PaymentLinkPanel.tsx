@@ -2,6 +2,8 @@ import cn from "clsx";
 import { useState } from "react";
 import { useRevalidator } from "react-router";
 import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
+import { account } from "../app/appwrite/client";
+import type { Models } from "appwrite";
 interface PaymentLinkPanelProps {
   tripId: string;
   initialPaymentLink: string | null;
@@ -53,9 +55,35 @@ const PaymentLinkPanel = ({
     setErrorMessage(null);
 
     try {
+      let user: Models.User | null = null;
+      try {
+        user = await account.get();
+      } catch (authErr: any) {
+        setErrorMessage("Your session has expired. Please sign in again.");
+        return;
+      }
+      if (!user?.$id) {
+        setErrorMessage("Your session has expired. Please sign in again.");
+        return;
+      }
+
+      // Generate a temporary , secure JWt from the active Appwrite session
+      let jwt: string | null = null;
+      try {
+        jwt = (await account.createJWT()).jwt;
+      } catch (error) {
+        console.error("JWT generation error: ", error);
+        setErrorMessage("Something went wrong, please try again.");
+        return;
+      }
+
       const response = await fetch("/api/retry-trip-payment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // Pass the JWT to your server
+          Authorization: `Bearer ${jwt}`,
+        },
         body: JSON.stringify({ tripId }),
       });
 
