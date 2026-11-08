@@ -133,7 +133,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       },
     });
 
-    const trip = JSON.parse(textResult.text);
+    const trip = JSON.parse(textResult.text || "");
 
     if (!trip || typeof trip.estimatedPrice !== "string") {
       return res(

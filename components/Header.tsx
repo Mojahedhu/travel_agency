@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router";
 import { cn } from "../app/lib/utils";
-import { ButtonComponent } from "@syncfusion/ej2-react-buttons";
 
 interface HeaderProps {
   title: string;

@@ -130,7 +130,7 @@ const CreateTrip = () => {
 
       <section className="wrapper-md mt-2.5">
         <form
-          aria-labelledby={error ? "form-error" : null}
+          aria-labelledby={error ? "form-error" : undefined}
           className="trip-form"
           onSubmit={handleSubmit}
         >
